@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"components/TrophyChart.tsx -> ./_TrophyChartImpl\":{\"id\":\"components/TrophyChart.tsx -> ./_TrophyChartImpl\",\"files\":[\"static/chunks/_app-pages-browser_components__TrophyChartImpl_tsx.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST='{"components/TrophyChart.tsx -> ./_TrophyChartImpl":{"id":9955,"files":["static/chunks/411.6befe33c4e225560.js","static/chunks/955.750d1ff8aace263a.js"]}}';
