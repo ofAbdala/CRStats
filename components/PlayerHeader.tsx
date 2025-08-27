@@ -8,11 +8,9 @@ export default function PlayerHeader({ player }: { player: any }) {
       
       <div className="relative flex items-center gap-6">
         <div className="relative">
-          <img 
-            src="https://cdn.statsroyale.com/images/arenas/full/arena12.png" 
-            alt="arena" 
-            className="w-24 h-24 rounded-2xl border-2 border-border-dark shadow-xl" 
-          />
+          <div className="w-24 h-24 rounded-2xl border-2 border-border-dark shadow-xl bg-gradient-to-br from-royal to-purple flex items-center justify-center">
+            <div className="text-4xl">🏟️</div>
+          </div>
           <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-gold to-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-lg shadow-lg">
             {player.expLevel}
           </div>
