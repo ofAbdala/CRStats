@@ -21,6 +21,7 @@ module.exports = {
         'royal': '#1e90ff',
         'royal-light': '#4da6ff',
         'royal-dark': '#1873cc',
+        'bg-dark': '#080B12',
         'gold': '#ffd700',
         'gold-light': '#ffed4e',
         'gold-dark': '#cc9900',
