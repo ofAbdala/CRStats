@@ -45,7 +45,10 @@ export default function BattleHistory({ battles }: { battles: any[] }) {
                 {b.trophyChange >= 0 ? '+' : ''}{b.trophyChange}
               </div>
               <div className="text-xs text-gray-500 mt-1">
-                {new Date(b.battleTime + 'Z').toLocaleTimeString('pt-BR', { 
+                {new Date(b.battleTime + 'Z').toLocaleString('pt-BR', { 
+                  timeZone: 'America/Sao_Paulo',
+                  day: '2-digit',
+                  month: '2-digit',
                   hour: '2-digit', 
                   minute: '2-digit' 
                 })}

@@ -40,6 +40,16 @@ export default function PlayerHeader({ player }: { player: any }) {
           <div className="text-4xl font-bold text-gold mb-1">{player.trophies.toLocaleString()}</div>
           <div className="text-sm text-gray-400">Troféus Atuais</div>
           <div className="text-xs text-gray-500 mt-1">Melhor: {player.bestTrophies.toLocaleString()}</div>
+          <div className="text-xs text-gray-500 mt-2">
+            Atualizado: {new Date().toLocaleString('pt-BR', { 
+              timeZone: 'America/Sao_Paulo',
+              day: '2-digit',
+              month: '2-digit', 
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
         </div>
       </div>
     </div>

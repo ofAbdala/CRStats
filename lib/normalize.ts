@@ -34,7 +34,13 @@ export function computeSummary(player: any, battles: any[]) {
   for (const b of oldestFirst) {
     t += (b.trophyChange || 0);
     series.push({
-      label: new Date(b.battleTime + 'Z').toLocaleString(),
+      label: new Date(b.battleTime + 'Z').toLocaleString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
       trophies: t
     });
   }
