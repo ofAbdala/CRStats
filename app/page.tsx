@@ -69,23 +69,49 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border-dark bg-card-dark/90 backdrop-blur px-4 py-3">
+    <div className="min-h-screen bg-bg-dark">
+      {/* Header Navigation */}
+      <header className="border-b border-border-dark bg-card-dark/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <div className="font-extrabold text-gold tracking-wide">ClashDex</div>
-          <form onSubmit={onSearch} className="flex items-center gap-2">
-            <input name="tag" defaultValue={tag}
-              placeholder="Digite a TAG (#XXXXXXX)"
-              className="px-3 py-2 rounded-md bg-[#101522] border border-border-dark text-white w-64"/>
-            <button className="px-4 py-2 rounded-md bg-royal hover:opacity-90">Buscar</button>
+          <div className="flex items-center gap-3 py-4 px-6">
+            <div className="w-8 h-8 bg-gradient-to-br from-royal to-purple rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">CR</span>
+            </div>
+            <div className="font-bold text-xl text-white">ClashDex</div>
+          </div>
+          
+          <form onSubmit={onSearch} className="flex items-center gap-3 py-4 px-6">
+            <div className="relative">
+              <input 
+                name="tag" 
+                defaultValue={tag}
+                placeholder="Digite a TAG (#XXXXXXX)"
+                className="px-4 py-2.5 rounded-lg bg-card-dark border border-border-dark text-white w-80 focus:border-royal focus:outline-none transition-colors placeholder:text-gray-500"
+              />
+            </div>
+            <button className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-royal to-purple hover:from-royal/90 hover:to-purple/90 text-white font-medium transition-all duration-200 shadow-lg">
+              Buscar
+            </button>
           </form>
-          <div className="text-xs text-gray-400">Supercell API • deploy-ready</div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto p-4 lg:p-6 space-y-4">
-        {loading && <div className="text-sm text-gray-400">Carregando…</div>}
-        {err && <div className="text-sm text-rose-400">Erro: {err}</div>}
+      <main className="max-w-6xl mx-auto p-6 space-y-6">
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="flex items-center gap-3 text-gray-400">
+              <div className="w-5 h-5 border-2 border-royal border-t-transparent rounded-full animate-spin"></div>
+              <span>Carregando dados do jogador...</span>
+            </div>
+          </div>
+        )}
+        
+        {err && (
+          <div className="bg-rose-900/20 border border-rose-900/50 rounded-xl p-4 text-rose-400">
+            <div className="font-medium">Erro ao carregar dados</div>
+            <div className="text-sm text-rose-300 mt-1">{err}</div>
+          </div>
+        )}
 
         {player && <PlayerHeader player={player} />}
         {player && summary && (
@@ -98,8 +124,17 @@ export default function Page() {
         )}
       </main>
 
-      <footer className="border-t border-border-dark bg-card-dark px-4 py-5 text-center text-xs text-gray-400">
-        UI inspirada no deep.gg • Clash Royale theme • Next.js + Supercell API
+      <footer className="border-t border-border-dark bg-card-dark/50 mt-12">
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-400">
+              Powered by <span className="text-royal">Supercell API</span> • Inspired by deep.gg
+            </div>
+            <div className="text-xs text-gray-500">
+              Next.js • Tailwind CSS • Recharts
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );
