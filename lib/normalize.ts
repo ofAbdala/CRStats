@@ -6,6 +6,16 @@ export function normalizeBattleRow(row: any) {
   const tc   = team.crowns ?? 0, oc = opp.crowns ?? 0;
   const result = tc > oc ? 'WIN' : tc < oc ? 'LOSS' : 'DRAW';
 
+  // Converter battleTime para timestamp brasileiro
+  const battleDate = new Date(row.battleTime + 'Z');
+  const brazilTime = battleDate.toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
   return {
     battleTime: row.battleTime,        // UTC string
     gameMode: row.gameMode?.name ?? '',
@@ -55,15 +65,25 @@ export function computeSummary(player: any, battles: any[]) {
 
   return {
     tag: (player.tag || '').replace('#', ''),
+    battleTimeFormatted: brazilTime,   // Formatado para Brasil
+    battleTimestamp: battleDate.getTime(), // Timestamp para cálculos
     name: player.name,
     trophiesNow: player.trophies,
+    gameModeId: row.gameMode?.id ?? 0,
     trophiesStart: start,
     trophyDelta: player.trophies - start,
     matchesTotal: windowRows.length,
     wins,
     losses,
+    opponentTrophies: opp.startingTrophies ?? 0,
     winRate: windowRows.length ? Math.round((wins / windowRows.length) * 100) : 0,
     pushDurationMs,
-    series
+    trophyChange: team.trophyChange ?? 0,
+    teamStartingTrophies: team.startingTrophies ?? 0,
+    deckSelection: row.deckSelection ?? 'collection',
+    type: row.type ?? 'PvP',
+    isLadderTournament: row.isLadderTournament ?? false,
+    arena: row.arena?.name ?? '',
+    arenaId: row.arena?.id ?? 0
   };
 }

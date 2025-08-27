@@ -46,7 +46,7 @@ export async function GET(
     console.log('Processed payload:', JSON.stringify(payload, null, 2));
 
     const res = NextResponse.json(payload);
-    res.headers.set('Cache-Control', 'private, max-age=30');
+    res.headers.set('Cache-Control', 'private, max-age=15'); // Cache menor para dados mais frescos
     return res;
   } catch (e: any) {
     console.error('Route crash', e);

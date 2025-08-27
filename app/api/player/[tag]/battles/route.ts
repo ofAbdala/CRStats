@@ -20,14 +20,16 @@ export async function GET(req: Request, { params }: { params: { tag: string } })
     const data = await r.json();
     
     // Log raw battles data for debugging
-    console.log('Raw battles data (first 3):', JSON.stringify(data.slice(0, 3), null, 2));
+    console.log(`Fetched ${data.length} battles for ${params.tag}`);
+    console.log('Latest battle time:', data[0]?.battleTime);
     
     const rows = data.slice(0, last).map(normalizeBattleRow);
     
-    console.log('Normalized battles (first 3):', JSON.stringify(rows.slice(0, 3), null, 2));
+    console.log('Normalized battles count:', rows.length);
+    console.log('Latest normalized battle:', rows[0]?.battleTimeFormatted);
 
     const res = NextResponse.json(rows);
-    res.headers.set('Cache-Control', 'private, max-age=30');
+    res.headers.set('Cache-Control', 'private, max-age=15'); // Cache menor para dados mais frescos
     return res;
   } catch (e: any) {
     console.error('Route crash', e);
