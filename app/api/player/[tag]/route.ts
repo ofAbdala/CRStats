@@ -14,7 +14,7 @@ export async function GET(
     console.log('Fetching player data from:', url);
     console.log('BaseURL', baseURL(), process.env.USE_PROXY, !!process.env.SUPERCELL_TOKEN);
     
-    const r = await fetchWithRetry(url, { headers: authHeaders() }, { timeoutMs: 10000, retries: 2 });
+    const r = await fetchWithRetry(url, { headers: authHeaders() }, { timeoutMs: 15000, retries: 3 });
     if (!r.ok) {
       const msg = await r.text().catch(() => '');
       console.error('Supercell API error', r.status, msg);
