@@ -1,4 +1,5 @@
 export function baseURL() {
+  console.log('Using proxy:', process.env.USE_PROXY, 'Base URL will be:', process.env.USE_PROXY === 'true' ? 'https://proxy.royaleapi.dev/v1' : 'https://api.clashroyale.com/v1');
   return process.env.USE_PROXY === 'true'
     ? 'https://proxy.royaleapi.dev/v1'
     : 'https://api.clashroyale.com/v1';
