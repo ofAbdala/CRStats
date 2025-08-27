@@ -17,6 +17,9 @@ export async function GET(
       return NextResponse.json({ code: r.status, message: msg || r.statusText }, { status: r.status });
     }
     const d = await r.json();
+    
+    // Log raw API response for debugging
+    console.log('Raw Supercell API response:', JSON.stringify(d, null, 2));
 
     const payload = {
       name: d.name,
@@ -24,12 +27,23 @@ export async function GET(
       trophies: d.trophies,
       bestTrophies: d.bestTrophies,
       expLevel: d.expLevel,
-      arena: d.arena?.name,
+      arena: d.arena?.name || 'Unknown Arena',
+      arenaId: d.arena?.id,
       clan: d.clan?.name ?? null,
+      clanTag: d.clan?.tag ?? null,
       wins: d.wins,
       losses: d.losses,
-      threeCrownWins: d.threeCrownWins
+      threeCrownWins: d.threeCrownWins,
+      donations: d.donations,
+      donationsReceived: d.donationsReceived,
+      totalDonations: d.totalDonations,
+      warDayWins: d.warDayWins,
+      clanCardsCollected: d.clanCardsCollected,
+      starPoints: d.starPoints,
+      expPoints: d.expPoints
     };
+
+    console.log('Processed payload:', JSON.stringify(payload, null, 2));
 
     const res = NextResponse.json(payload);
     res.headers.set('Cache-Control', 'private, max-age=30');

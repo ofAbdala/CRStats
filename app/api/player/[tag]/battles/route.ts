@@ -18,7 +18,13 @@ export async function GET(req: Request, { params }: { params: { tag: string } })
       return NextResponse.json({ code: r.status, message: msg || r.statusText }, { status: r.status });
     }
     const data = await r.json();
+    
+    // Log raw battles data for debugging
+    console.log('Raw battles data (first 3):', JSON.stringify(data.slice(0, 3), null, 2));
+    
     const rows = data.slice(0, last).map(normalizeBattleRow);
+    
+    console.log('Normalized battles (first 3):', JSON.stringify(rows.slice(0, 3), null, 2));
 
     const res = NextResponse.json(rows);
     res.headers.set('Cache-Control', 'private, max-age=30');
