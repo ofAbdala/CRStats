@@ -9,9 +9,11 @@ export async function GET(
 ) {
   try {
     const url = `${baseURL()}/players/${encodeTag(params.tag)}`;
+    console.log('Fetching player data from:', url);
     const r = await fetch(url, { headers: authHeaders(), cache: 'no-store' });
     if (!r.ok) {
       const msg = await r.text();
+      console.error('Supercell API error', r.status, msg);
       return NextResponse.json({ code: r.status, message: msg || r.statusText }, { status: r.status });
     }
     const d = await r.json();
@@ -33,6 +35,7 @@ export async function GET(
     res.headers.set('Cache-Control', 'private, max-age=30');
     return res;
   } catch (e: any) {
+    console.error('Route crash', e);
     return NextResponse.json({ code: 500, message: e.message || 'Internal error' }, { status: 500 });
   }
 }
