@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { authHeaders, baseURL, encodeTag } from '@/lib/supercell';
 import { normalizeBattleRow, computeSummary } from '@/lib/normalize';
+import { fetchWithRetry } from '@/lib/fetcher';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request, { params }: { params: { tag: string } }) {
@@ -11,20 +13,22 @@ export async function GET(req: Request, { params }: { params: { tag: string } })
     const tagEnc = encodeTag(params.tag);
 
     console.log('Fetching player and battles for summary:', `${baseURL()}/players/${tagEnc}`);
+    console.log('BaseURL', baseURL(), process.env.USE_PROXY, !!process.env.SUPERCELL_TOKEN);
+    
     const [p, b] = await Promise.all([
-      fetch(`${baseURL()}/players/${tagEnc}`, { headers: authHeaders(), cache: 'no-store' }),
-      fetch(`${baseURL()}/players/${tagEnc}/battlelog`, { headers: authHeaders(), cache: 'no-store' })
+      fetchWithRetry(`${baseURL()}/players/${tagEnc}`, { headers: authHeaders() }, { timeoutMs: 10000, retries: 2 }),
+      fetchWithRetry(`${baseURL()}/players/${tagEnc}/battlelog`, { headers: authHeaders() }, { timeoutMs: 10000, retries: 2 })
     ]);
 
     if (!p.ok) {
-      const msg = await p.text();
+      const msg = await p.text().catch(() => '');
       console.error('Player API error', p.status, msg);
-      return NextResponse.json({ code: p.status, message: msg || p.statusText }, { status: p.status });
+      return NextResponse.json({ error: true, status: p.status, body: msg || p.statusText }, { status: p.status });
     }
     if (!b.ok) {
-      const msg = await b.text();
+      const msg = await b.text().catch(() => '');
       console.error('Battles API error', b.status, msg);
-      return NextResponse.json({ code: b.status, message: msg || b.statusText }, { status: b.status });
+      return NextResponse.json({ error: true, status: b.status, body: msg || b.statusText }, { status: b.status });
     }
 
     const player  = await p.json();

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { authHeaders, baseURL, encodeTag } from '@/lib/supercell';
 import { normalizeBattleRow } from '@/lib/normalize';
+import { fetchWithRetry } from '@/lib/fetcher';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request, { params }: { params: { tag: string } }) {
@@ -10,12 +12,13 @@ export async function GET(req: Request, { params }: { params: { tag: string } })
     const last = Math.max(1, Math.min(50, parseInt(searchParams.get('last') || '25', 10)));
     const url  = `${baseURL()}/players/${encodeTag(params.tag)}/battlelog`;
     console.log('Fetching battles from:', url);
+    console.log('BaseURL', baseURL(), process.env.USE_PROXY, !!process.env.SUPERCELL_TOKEN);
 
-    const r = await fetch(url, { headers: authHeaders(), cache: 'no-store' });
+    const r = await fetchWithRetry(url, { headers: authHeaders() }, { timeoutMs: 10000, retries: 2 });
     if (!r.ok) {
-      const msg = await r.text();
+      const msg = await r.text().catch(() => '');
       console.error('Supercell API error', r.status, msg);
-      return NextResponse.json({ code: r.status, message: msg || r.statusText }, { status: r.status });
+      return NextResponse.json({ error: true, status: r.status, body: msg || r.statusText }, { status: r.status });
     }
     const data = await r.json();
     
