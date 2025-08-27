@@ -1,132 +1,129 @@
 # ⚡ Clash Royale Status (Next.js + Supercell API)
 
-App completo de estatísticas do Clash Royale usando **Next.js 14 (App Router)** e a **API oficial da Supercell**.
-Interface inspirada no deep.gg com tema dark e gráficos interativos.
+App completo de estatísticas do Clash Royale em **Next.js 14 (App Router)**.
+UI dark inspirada no deep.gg, gráficos (Recharts) e API Routes no mesmo domínio.
 
-**✅ Corrigido para evitar erro `t._onTimeout` no Bolt**
+> **Importante:** Este projeto é **Next.js (server)**.  
+> Não use Vite nem `index.html`. Build/Start via `next`.
 
-## ⚙️ Configuração
+---
 
-* **Framework**: Next.js 14 (App Router)
-* **Porta**: 3000
-* **Styling**: Tailwind CSS
-* **Gráficos**: Recharts
-* **API**: Supercell Official API
+## Requisitos
+- Node 18+ (recomendado 20+)
+- npm 9+
 
-## 🔐 Variáveis de ambiente
+## Scripts
+```json
+{
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000"
+  }
+}
+```
 
-Crie um arquivo `.env.local` na raiz do projeto:
+## Variáveis de ambiente
 
-```env
-SUPERCELL_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImVhMmU0NWEwLTVlMzEtNGZjZS04MDkyLTMzZjYxNjQ1YWNjYyIsImlhdCI6MTc1NjI5OTk2NCwic3ViIjoiZGV2ZWxvcGVyLzFmYjRhZjE5LTQ4ZjItMzc1Ni0wN2ZhLWMxNTI5NjIzZjczNSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxNzcuMzIuMjUyLjMzIl0sInR5cGUiOiJjbGllbnQifV19.QE4jGzMK-ECR9EE64aYWTRK7famC7MYDX-UssJWueXUVIWrX-FOIqcDgvDuTlvWQkMiSE6DbD17_uyk-C9TAKg
-USE_PROXY=true
+Crie **`.env.local`** na raiz (NÃO commit):
+
+```
+SUPERCELL_TOKEN=SEU_TOKEN_DA_SUPERCELL
+USE_PROXY=false    # local com IP whitelisted; em hospedagem com IP dinâmico use true
 DEFAULT_TAG=U9UUCCQ
 ```
 
-> ⚠️ **Importante**: Use `USE_PROXY=true` no Bolt (IP dinâmico).
-
-## 🚀 Como rodar
-
-### Desenvolvimento
+## Rodar em desenvolvimento
 
 ```bash
-# Instalar dependências
 npm install
-
-# Rodar em desenvolvimento
 npm run dev
+# abra http://localhost:3000
 ```
 
-Abrir `http://localhost:3000`
+### Testes rápidos (dev)
 
-### Produção
+* `http://localhost:3000/api/player/U9UUCCQ`
+* `http://localhost:3000/api/player/U9UUCCQ/battles?last=20`
+* `http://localhost:3000/api/player/U9UUCCQ/summary?last=20`
+
+Se retornarem JSON, a home renderiza tudo.
+
+## Build de produção
 
 ```bash
-# Build de produção
 npm run build
-
-# Rodar build localmente
-npm start
+npm start   # porta 3000
 ```
 
-## 🛠️ Funcionalidades
+---
 
-### Página Principal (`/`)
-- Header do player (nome, tag, arena, troféus, clã)
-- Cards de resumo (melhor temporada, 3 coroas, winrate, trophy delta)
-- Push atual (vitórias, derrotas, duração)
-- Gráfico de troféus interativo
-- Histórico de batalhas (últimas 20)
+## Endpoints
 
-### API Endpoints
-- `/api/player/:tag` - Dados do jogador
-- `/api/player/:tag/battles` - Histórico de batalhas
-- `/api/player/:tag/summary` - Resumo e estatísticas
+* `GET /api/player/:tag`
+* `GET /api/player/:tag/battles?last=20`
+* `GET /api/player/:tag/summary?last=20`
 
-## 🎯 Testes rápidos
+### Rota de health (opcional para debug)
 
-Teste os endpoints diretamente:
-- `http://localhost:3000/api/player/U9UUCCQ`
-- `http://localhost:3000/api/player/U9UUCCQ/battles?last=20`
-- `http://localhost:3000/api/player/U9UUCCQ/summary?last=20`
+Crie `app/api/health/route.ts`:
 
-## 🔧 Correções aplicadas
+```ts
+import { NextResponse } from 'next/server';
+import { baseURL } from '@/lib/supercell';
 
-### Timer Shims
-- Adicionados shims para `setTimeout` e `setInterval` no client
-- Previne erro `t._onTimeout is not a function` no Bolt
-- Hook `usePolling` robusto para polling seguro
+export const dynamic = 'force-dynamic';
 
-### Configuração Next.js
-- Scripts corretos no `package.json`
-- Porta 3000 configurada
-- Proxy RoyaleAPI habilitado
-
-## 🌐 Deploy
-
-### Bolt Hosting
-Use o botão **Publish** do Bolt para deploy direto.
-
-### Vercel (Alternativo)
-1. Suba o repo para GitHub
-2. Na Vercel: **New Project → Import**
-3. Adicione as variáveis de ambiente:
-   - `SUPERCELL_TOKEN`
-   - `USE_PROXY=true`
-   - `DEFAULT_TAG=U9UUCCQ`
-4. Deploy automático
-
-## 📁 Estrutura do projeto
-
-```
-├── app/
-│   ├── api/player/[tag]/          # API routes
-│   ├── globals.css                # Estilos globais
-│   ├── layout.tsx                 # Layout principal
-│   └── page.tsx                   # Página principal (com timer shims)
-├── components/                    # Componentes React
-├── lib/                          # Utilitários
-│   ├── supercell.ts              # Cliente Supercell API
-│   ├── normalize.ts              # Normalização de dados
-│   └── usePolling.ts             # Hook de polling robusto
-├── .env.local                    # Variáveis de ambiente
-├── next.config.js                # Configuração Next.js
-└── tailwind.config.js            # Configuração Tailwind
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    baseURL: baseURL(),
+    USE_PROXY: process.env.USE_PROXY,
+    hasToken: !!process.env.SUPERCELL_TOKEN
+  });
+}
 ```
 
-## 🎨 Design
+---
 
-Interface dark inspirada no deep.gg com:
-- Tema royal blue e gold
-- Cards com bordas sutis
-- Gráficos interativos
-- Layout responsivo
-- Micro-interações
+## Deploy
 
-## 🔧 Tecnologias
+### Bolt (StackBlitz)
 
-- **Next.js 14** - Framework React
-- **TypeScript** - Tipagem estática
-- **Tailwind CSS** - Styling
-- **Recharts** - Gráficos
-- **Supercell API** - Dados do jogo
+1. **Environment Variables** no painel (produção):
+
+   * `SUPERCELL_TOKEN` = seu token (uma linha, sem aspas)
+   * `USE_PROXY` = `true`  ← IP do Bolt é dinâmico
+   * `DEFAULT_TAG` = `U9UUCCQ`
+2. **Build/Start/Port**:
+
+   * Build Command: `npm run build`
+   * Start Command: `npm start`
+   * Port: `3000`
+3. **Não usar Vite** (não existe `index.html`).
+4. Publicar com **Publish** e testar:
+
+   * `/api/health` → deve mostrar `baseURL: https://proxy.royaleapi.dev/v1`, `USE_PROXY: "true"`, `hasToken: true`.
+
+### Vercel
+
+* Importar o repositório
+* Em **Environment Variables**:
+
+  * `SUPERCELL_TOKEN`
+  * `USE_PROXY=true`
+  * `DEFAULT_TAG=U9UUCCQ`
+* Deploy → testar `/api/health`.
+
+---
+
+## Erros comuns
+
+* **"Could not resolve entry module index.html / vite build"**
+  → projeto é Next.js, publique como **Node/Next** com `npm run build` / `npm start`.
+
+* **403 `accessDenied.invalidIp`**
+  → habilite o **proxy**: `USE_PROXY=true` (em produção).
+
+* **500 nas rotas**
+  → variáveis de ambiente ausentes no ambiente de produção (use o painel de envs).
