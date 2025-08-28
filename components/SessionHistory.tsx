@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Clock, Trophy, TrendingUp, TrendingDown, Calendar, Target, Crown, Swords } from 'lucide-react';
 import { parseClashTime, formatDateTime, calculateDuration, formatAgo } from '@/lib/time';
+import { getArenaByTrophies } from '@/lib/arenas';
 
 // Função para agrupar batalhas por sessões (baseado em gaps de tempo)
 function groupBattlesBySessions(battles: any[]) {
@@ -150,14 +151,14 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
   
   if (sessions.length === 0) {
     return (
-      <div className="bg-card-dark border border-border-dark rounded-xl p-6">
+      <div className="glass-dark float p-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-            <Clock className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/80 to-purple-600/80 rounded-2xl flex items-center justify-center">
+            <Clock className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h2 className="font-bold text-lg text-white">Histórico de Sessões</h2>
-            <p className="text-sm text-gray-400">Nenhuma sessão encontrada</p>
+            <h2 className="text-2xl font-bold text-white">Histórico de Sessões</h2>
+            <p className="text-white/70">Nenhuma sessão encontrada</p>
           </div>
         </div>
       </div>
@@ -165,14 +166,14 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
   }
 
   return (
-    <div className="bg-card-dark border border-border-dark rounded-xl p-6">
+    <div className="glass-dark float p-8">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-          <Clock className="w-6 h-6 text-white" />
+        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/80 to-purple-600/80 rounded-2xl flex items-center justify-center">
+          <Clock className="w-7 h-7 text-white" />
         </div>
         <div>
-          <h2 className="font-bold text-lg text-white">Histórico de Sessões</h2>
-          <p className="text-sm text-gray-400">{sessions.length} sessões de jogo</p>
+          <h2 className="text-2xl font-bold text-white">Histórico de Sessões</h2>
+          <p className="text-white/70">{sessions.length} sessões de jogo</p>
         </div>
       </div>
       
@@ -180,7 +181,7 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
         {sessions.map((session) => (
           <div key={session.id} className="space-y-3">
             {/* Header da Sessão */}
-            <div className="flex items-center gap-4 text-sm text-gray-400 bg-bg-dark/30 rounded-lg p-3">
+            <div className="flex items-center gap-4 text-sm text-white/70 glass rounded-2xl p-4">
               <span className="font-medium">{formatTimeAgo(session.daysAgo)}</span>
               <span>•</span>
               <span>{session.total} Jogos</span>
@@ -193,7 +194,7 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
                 {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
               </span>
               <span>•</span>
-              <span className="text-orange-400">Challenger</span>
+              <span className="text-orange-400">{getArenaByTrophies(session.battles[0]?.opponentTrophies || 5000).name}</span>
               <span>•</span>
               <span className="text-blue-400">{formatSessionDuration(session.duration)}</span>
             </div>
@@ -203,10 +204,10 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
               {session.battles.map((battle, battleIndex) => (
                 <div 
                   key={battleIndex} 
-                  className={`rounded-lg border-l-4 p-3 ${
+                  className={`glass-dark border-l-4 p-4 hover-lift ${
                     battle.result === 'WIN' 
-                      ? 'bg-emerald-900/10 border-l-emerald-500' 
-                      : 'bg-rose-900/10 border-l-rose-500'
+                      ? 'border-l-emerald-500' 
+                      : 'border-l-rose-500'
                   }`}
                 >
                   <div className="flex items-center justify-between">

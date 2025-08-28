@@ -1,3 +1,76 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ---------------- iOS vibes helpers ---------------- */
+:root {
+  --glass-bg: 255 255 255; /* base branca pra blur */
+}
+
+.font-sans { 
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', 'SF Pro Display', Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'; 
+}
+
+/* vidro fosco */
+.glass {
+  @apply border border-white/15 rounded-3xl;
+  background-color: rgba(var(--glass-bg), 0.06);
+  backdrop-filter: blur(20px) saturate(140%);
+}
+
+/* vidro mais escuro para cards */
+.glass-dark {
+  @apply border border-white/10 rounded-2xl;
+  background-color: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(20px) saturate(140%);
+}
+
+/* linhas finas translucidas */
+.hairline { border-color: rgba(255,255,255,0.12); }
+
+/* gradientes suaves estilo Apple */
+.bg-hero {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.20), transparent 60%),
+    radial-gradient(900px 600px at 110% 10%, rgba(168,85,247,.22), transparent 60%),
+    radial-gradient(800px 600px at 50% 120%, rgba(59,130,246,.18), transparent 60%),
+    #0a0a0a;
+}
+
+/* texto com gradiente */
+.text-gradient {
+  background: linear-gradient(90deg, #fff, #c7d2fe 50%, #f0abfc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* botão sutil iOS */
+.btn-ios {
+  @apply glass px-5 py-2.5 text-sm font-medium hover:brightness-110 transition-all duration-200;
+}
+
+/* sombra suave "flutuando" */
+.float {
+  box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* animação leve */
+@keyframes floaty { 
+  from { transform: translateY(0) } 
+  50% { transform: translateY(-4px) } 
+  to { transform: translateY(0) } 
+}
+.floaty { animation: floaty 6s ease-in-out infinite; }
+
+/* hover micro-interactions */
+.hover-lift {
+  @apply transition-all duration-200 hover:scale-[1.02] hover:-translate-y-1;
+}
+
+/* nav translúcida */
+.nav-glass {
+  @apply glass;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px) saturate(140%);
+}

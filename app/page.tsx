@@ -25,13 +25,13 @@ if (typeof window !== 'undefined') {
 import { useEffect, useState } from 'react';
 import { Search, TrendingUp, Trophy, Users, Zap, Crown, Target, BarChart3, RefreshCw, Star, Calendar, Clock, Award } from 'lucide-react';
 import PlayerHeader from '@/components/PlayerHeader';
-import SummaryCards from '@/components/SummaryCards';
 import TrophyChart from '@/components/TrophyChart';
 import BattleHistory from '@/components/BattleHistory';
-import CurrentPush from '@/components/CurrentPush';
 import LeagueInfo from '@/components/LeagueInfo';
 import SessionHistory from '@/components/SessionHistory';
+import GradientOrbs from '@/components/GradientOrbs';
 import { usePolling } from '@/lib/usePolling';
+import { getArenaByTrophies } from '@/lib/arenas';
 
 async function fetchJson(url: string) {
   const r = await fetch(url, { cache: 'no-store' });
@@ -150,434 +150,427 @@ export default function Page() {
   const popularPlayers = getPopularPlayersFromBattles();
 
   return (
-    <div className="min-h-screen bg-bg-dark">
-      {/* Header Navigation */}
-      <header className="border-b border-border-dark bg-card-dark/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-royal to-purple rounded-xl flex items-center justify-center">
-              <Crown className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="font-bold text-xl text-white">ClashDex</div>
-              <div className="text-xs text-gray-400">Clash Royale Stats</div>
-            </div>
-          </div>
-          
-          {showPlayerData && (
-            <button 
-              onClick={() => setShowPlayerData(false)}
-              className="px-4 py-2 rounded-lg bg-card-dark border border-border-dark text-gray-300 hover:text-white hover:border-royal transition-colors"
-            >
-              ← Voltar ao Início
-            </button>
-          )}
-        </div>
-      </header>
-
+    <div className="relative min-h-screen bg-hero">
+      <GradientOrbs />
+      
       {!showPlayerData ? (
         /* Homepage */
-        <main className="max-w-6xl mx-auto">
-          {/* Hero Section */}
-          <section className="text-center py-20 px-6">
-            <div className="mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-royal to-purple rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Crown className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="text-5xl font-bold text-white mb-4">
-                Clash<span className="text-royal">Dex</span>
-              </h1>
-              <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-                Analise suas estatísticas do Clash Royale com gráficos detalhados, 
-                histórico de batalhas e progresso de troféus em tempo real.
-              </p>
-            </div>
-
-            {/* Search Form */}
-            <form onSubmit={onSearch} className="max-w-md mx-auto mb-8">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input 
-                  name="tag" 
-                  value={tag}
-                  onChange={(e) => setTag(e.target.value)}
-                  placeholder="Digite sua TAG (#XXXXXXX)"
-                  className="w-full pl-12 pr-4 py-4 rounded-xl bg-card-dark border border-border-dark text-white focus:border-royal focus:outline-none transition-colors placeholder:text-gray-500 text-center"
-                />
-              </div>
-              <button 
-                type="submit"
-                disabled={loading}
-                className="w-full mt-4 px-8 py-4 rounded-xl bg-gradient-to-r from-royal to-purple hover:from-royal/90 hover:to-purple/90 text-white font-semibold transition-all duration-200 shadow-lg"
-              >
-                {loading ? 'Buscando...' : 'Buscar Jogador'}
-              </button>
-            </form>
-
-            {/* Quick Demo Button */}
-            <div className="text-center">
-              <button 
-              onClick={loadDefaultPlayer}
-              className="text-royal hover:text-royal/80 transition-colors font-medium"
-              >
-              Ver exemplo com jogador demo →
-              </button>
-              <div className="text-xs text-gray-500 mt-2">
-                Ou digite qualquer TAG de jogador (ex: #2PP, #8QU8J9LP)
-              </div>
-            </div>
-
-            {loading && (
-              <div className="flex items-center justify-center py-8">
-                <div className="flex items-center gap-3 text-gray-400">
-                  <div className="w-5 h-5 border-2 border-royal border-t-transparent rounded-full animate-spin"></div>
-                  <span>Carregando dados do jogador...</span>
+        <main className="relative">
+          {/* Header Navigation */}
+          <header className="fixed top-0 inset-x-0 z-50">
+            <nav className="mx-auto max-w-7xl px-4 md:px-6">
+              <div className="mt-4 nav-glass float flex items-center justify-between px-6 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-xl flex items-center justify-center">
+                    <Crown className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-lg font-bold tracking-wide text-white/95">ClashDex</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-white/70">Clash Royale Stats</span>
                 </div>
               </div>
-            )}
-            
-            {err && (
-              <div className="bg-rose-900/20 border border-rose-900/50 rounded-xl p-4 text-rose-400 max-w-md mx-auto mt-6">
-                <div className="font-medium">Erro ao carregar dados</div>
-                <div className="text-sm text-rose-300 mt-1">{err}</div>
+            </nav>
+          </header>
+
+          {/* Hero Section */}
+          <section className="relative pt-[8rem] md:pt-[10rem] pb-16 px-6">
+            <div className="mx-auto max-w-7xl">
+              <div className="max-w-4xl mx-auto text-center">
+                <div className="mb-8">
+                  <div className="w-24 h-24 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-3xl flex items-center justify-center mx-auto mb-8 float floaty">
+                    <Crown className="w-12 h-12 text-white" />
+                  </div>
+                  <h1 className="text-gradient text-6xl md:text-8xl font-extrabold leading-[1.05] mb-6">
+                    Clash<span className="text-cyan-400">Dex</span>
+                  </h1>
+                  <p className="text-xl md:text-2xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
+                    Analise suas estatísticas do Clash Royale com interface inspirada no iOS. 
+                    Gráficos elegantes, histórico detalhado e progresso em tempo real.
+                  </p>
+                </div>
+
+                {/* Search Form */}
+                <div className="max-w-lg mx-auto mb-12">
+                  <form onSubmit={onSearch}>
+                    <div className="glass float p-2">
+                      <div className="relative">
+                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 w-5 h-5" />
+                        <input 
+                          name="tag" 
+                          value={tag}
+                          onChange={(e) => setTag(e.target.value)}
+                          placeholder="Digite sua TAG (#XXXXXXX)"
+                          className="w-full pl-12 pr-4 py-4 bg-transparent text-white placeholder:text-white/50 focus:outline-none text-center text-lg"
+                        />
+                      </div>
+                    </div>
+                    <button 
+                      type="submit"
+                      disabled={loading}
+                      className="w-full mt-4 glass float px-8 py-4 text-white font-semibold transition-all duration-200 hover:brightness-110 disabled:opacity-50"
+                    >
+                      {loading ? 'Buscando...' : 'Buscar Jogador'}
+                    </button>
+                  </form>
+
+                  {/* Quick Demo Button */}
+                  <div className="text-center mt-6">
+                    <button 
+                      onClick={loadDefaultPlayer}
+                      className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+                    >
+                      Ver exemplo com jogador demo →
+                    </button>
+                    <div className="text-sm text-white/50 mt-2">
+                      Ou digite qualquer TAG de jogador (ex: #2PP, #8QU8J9LP)
+                    </div>
+                  </div>
+                </div>
+
+                {loading && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="glass float px-6 py-4">
+                      <div className="flex items-center gap-3 text-white/70">
+                        <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Carregando dados do jogador...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {err && (
+                  <div className="glass float p-6 text-rose-400 max-w-md mx-auto mt-6 border-rose-500/20">
+                    <div className="font-medium">Erro ao carregar dados</div>
+                    <div className="text-sm text-rose-300 mt-1">{err}</div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </section>
 
           {/* Features Section */}
-          <section className="py-16 px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">Recursos Principais</h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">
-                Descubra tudo o que o ClashDex oferece para melhorar sua experiência no Clash Royale
-              </p>
-            </div>
+          <section className="relative py-20 px-6">
+            <div className="mx-auto max-w-7xl">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Recursos Principais</h2>
+                <p className="text-xl text-white/70 max-w-3xl mx-auto">
+                  Descubra tudo o que o ClashDex oferece para melhorar sua experiência no Clash Royale
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {features.map((feature, index) => (
-                <div key={index} className="bg-card-dark border border-border-dark rounded-xl p-6 hover:border-royal/50 transition-all duration-200 group">
-                  <div className="w-12 h-12 bg-gradient-to-br from-royal/20 to-purple/20 rounded-xl flex items-center justify-center mb-4 group-hover:from-royal/30 group-hover:to-purple/30 transition-all">
-                    <div className="text-royal group-hover:text-white transition-colors">
-                      {feature.icon}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {features.map((feature, index) => (
+                  <div key={index} className="glass-dark float hover-lift p-8">
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-400/20 to-fuchsia-500/20 rounded-2xl flex items-center justify-center mb-6 floaty">
+                      <div className="text-cyan-400">
+                        {feature.icon}
+                      </div>
                     </div>
+                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                    <p className="text-white/70">{feature.description}</p>
                   </div>
-                  <h3 className="font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-sm text-gray-400">{feature.description}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
 
           {/* Popular Players Section */}
           {popularPlayers.length > 0 && (
-            <section className="py-16 px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">Jogadores Recentes</h2>
-              <p className="text-gray-400">Oponentes encontrados nas últimas batalhas</p>
-            </div>
+            <section className="relative py-20 px-6">
+              <div className="mx-auto max-w-7xl">
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Jogadores Recentes</h2>
+                  <p className="text-xl text-white/70">Oponentes encontrados nas últimas batalhas</p>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {popularPlayers.map((player, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setTag(player.tag);
-                    load(player.tag);
-                  }}
-                  className="bg-card-dark border border-border-dark rounded-xl p-6 hover:border-royal/50 transition-all duration-200 group text-left"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-gold to-yellow-500 rounded-xl flex items-center justify-center">
-                      <span className="text-lg">👤</span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-white group-hover:text-royal transition-colors">
-                        {player.name}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {popularPlayers.map((player, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setTag(player.tag);
+                        load(player.tag);
+                      }}
+                      className="glass-dark float hover-lift p-6 text-left"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-gradient-to-br from-gold/80 to-yellow-400/80 rounded-2xl flex items-center justify-center">
+                          <span className="text-2xl">👤</span>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold text-white">
+                            {player.name}
+                          </div>
+                          <div className="text-white/60">#{player.tag}</div>
+                          <div className="text-sm text-gold">{player.trophies !== "N/A" ? `${player.trophies} troféus` : "Troféus não disponíveis"}</div>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-400">#{player.tag}</div>
-                      <div className="text-sm text-gold">{player.trophies !== "N/A" ? `${player.trophies} troféus` : "Troféus não disponíveis"}</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
           )}
 
           {/* Stats Preview */}
-          <section className="py-16 px-6 bg-card-dark/30">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">Estatísticas Detalhadas</h2>
-              <p className="text-gray-400">Veja um preview do que você encontrará ao buscar um jogador</p>
-            </div>
+          <section className="relative py-20 px-6">
+            <div className="mx-auto max-w-7xl">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Estatísticas Detalhadas</h2>
+                <p className="text-xl text-white/70">Veja um preview do que você encontrará ao buscar um jogador</p>
+              </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              <div className="bg-card-dark border border-border-dark rounded-xl p-6 text-center">
-                <TrendingUp className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
-                <div className="text-2xl font-bold text-emerald-400 mb-1">65%</div>
-                <div className="text-sm text-gray-400">Win Rate</div>
-              </div>
-              <div className="bg-card-dark border border-border-dark rounded-xl p-6 text-center">
-                <Crown className="w-8 h-8 text-gold mx-auto mb-3" />
-                <div className="text-2xl font-bold text-gold mb-1">1,247</div>
-                <div className="text-sm text-gray-400">3 Coroas</div>
-              </div>
-              <div className="bg-card-dark border border-border-dark rounded-xl p-6 text-center">
-                <Trophy className="w-8 h-8 text-purple mx-auto mb-3" />
-                <div className="text-2xl font-bold text-purple mb-1">6,543</div>
-                <div className="text-sm text-gray-400">Melhor Temporada</div>
-              </div>
-              <div className="bg-card-dark border border-border-dark rounded-xl p-6 text-center">
-                <Zap className="w-8 h-8 text-royal mx-auto mb-3" />
-                <div className="text-2xl font-bold text-royal mb-1">+127</div>
-                <div className="text-sm text-gray-400">Push Atual</div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                <div className="glass-dark float p-8 text-center floaty">
+                  <TrendingUp className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-emerald-400 mb-2">65%</div>
+                  <div className="text-white/70">Win Rate</div>
+                </div>
+                <div className="glass-dark float p-8 text-center floaty" style={{ animationDelay: '1s' }}>
+                  <Crown className="w-10 h-10 text-gold mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-gold mb-2">1,247</div>
+                  <div className="text-white/70">3 Coroas</div>
+                </div>
+                <div className="glass-dark float p-8 text-center floaty" style={{ animationDelay: '2s' }}>
+                  <Trophy className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-fuchsia-400 mb-2">6,543</div>
+                  <div className="text-white/70">Melhor Temporada</div>
+                </div>
+                <div className="glass-dark float p-8 text-center floaty" style={{ animationDelay: '3s' }}>
+                  <Zap className="w-10 h-10 text-cyan-400 mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-cyan-400 mb-2">+127</div>
+                  <div className="text-white/70">Push Atual</div>
+                </div>
               </div>
             </div>
           </section>
         </main>
       ) : (
         /* Player Data View */
-        <main className="max-w-7xl mx-auto p-6">
-          {/* Player Header com botão de atualizar */}
-          {player && (
-            <div className="bg-card-dark border border-border-dark rounded-xl p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-royal to-purple flex items-center justify-center text-3xl border-2 border-border-dark">
-                    👑
+        <main className="relative">
+          {/* Header Navigation */}
+          <header className="fixed top-0 inset-x-0 z-50">
+            <nav className="mx-auto max-w-7xl px-4 md:px-6">
+              <div className="mt-4 nav-glass float flex items-center justify-between px-6 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-xl flex items-center justify-center">
+                    <Crown className="w-5 h-5 text-white" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h1 className="text-3xl font-bold text-white">{player.name}</h1>
-                      <span className="text-lg text-gray-400 font-mono">#{player.tag}</span>
-                      <Star className="w-5 h-5 text-gold" />
-                    </div>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-royal rounded-full"></div>
-                        <span className="text-gray-300">{player.arena || 'Arena Desconhecida'}</span>
-                      </div>
-                      {player.clan && (
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-purple rounded-full"></div>
-                          <span className="text-gray-300">{player.clan}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <span className="text-lg font-bold tracking-wide text-white/95">ClashDex</span>
                 </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-4xl font-bold text-gold mb-1">{player.trophies.toLocaleString()}</div>
-                    <div className="text-sm text-gray-400">Troféus Atuais</div>
-                    <div className="text-xs text-gray-500 mt-1">Melhor: {player.bestTrophies.toLocaleString()}</div>
-                  </div>
-                  
-                  <button
-                    onClick={refreshData}
-                    disabled={isRefreshing}
-                    className="flex items-center gap-2 px-4 py-2 bg-royal hover:bg-royal/80 text-white rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    {isRefreshing ? 'Atualizando...' : 'Atualizar'}
-                  </button>
-                </div>
-              </div>
-              
-              {lastUpdated && (
-                <div className="text-xs text-gray-500 flex items-center gap-2">
-                  <Clock className="w-3 h-3" />
-                  <span>
-                    Atualização mais recente: {lastUpdated.toLocaleString('pt-BR', {
-                      timeZone: 'America/Sao_Paulo',
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Tabs Navigation */}
-          <div className="bg-card-dark border border-border-dark rounded-xl mb-6">
-            <div className="flex border-b border-border-dark">
-              {[
-                { id: 'resumo', label: 'Resumo', icon: <BarChart3 className="w-4 h-4" /> },
-                { id: 'historico', label: 'Histórico', icon: <Calendar className="w-4 h-4" /> },
-                { id: 'estatisticas', label: 'Estatísticas', icon: <Trophy className="w-4 h-4" /> },
-                { id: 'live', label: 'Ao Vivo', icon: <Zap className="w-4 h-4" /> }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'text-royal border-b-2 border-royal bg-royal/5'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
+                <button 
+                  onClick={() => setShowPlayerData(false)}
+                  className="btn-ios"
                 >
-                  {tab.icon}
-                  {tab.label}
+                  ← Voltar ao Início
                 </button>
-              ))}
-            </div>
-          </div>
+              </div>
+            </nav>
+          </header>
 
-          {/* Tab Content */}
-          {activeTab === 'resumo' && player && summary && (
-            <div className="space-y-6">
-              <LeagueInfo player={player} />
-              <SummaryCards player={player} summary={summary} />
-              <CurrentPush summary={summary} />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <TrophyChart series={summary.series} />
-                <div className="bg-card-dark border border-border-dark rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                      <Award className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="font-bold text-lg text-white">Conquistas Recentes</h2>
-                      <p className="text-sm text-gray-400">Últimos marcos alcançados</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="bg-bg-dark/50 rounded-lg p-4 border border-border-dark/50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-sm">🏆</div>
-                        <div>
-                          <div className="font-semibold text-white">Novo Recorde Pessoal</div>
-                          <div className="text-sm text-gray-400">{player.bestTrophies.toLocaleString()} troféus</div>
+          <div className="pt-[7rem] px-6">
+            <div className="max-w-7xl mx-auto">
+              {/* Player Header */}
+              {player && (
+                <div className="glass-dark float p-8 mb-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-6">
+                      <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-cyan-400 to-fuchsia-500 flex items-center justify-center text-4xl border-2 border-white/10 float">
+                        👑
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-4 mb-3">
+                          <h1 className="text-4xl md:text-5xl font-bold text-white">{player.name}</h1>
+                          <span className="text-xl text-white/60 font-mono">#{player.tag}</span>
+                          <Star className="w-6 h-6 text-gold" />
+                        </div>
+                        <div className="flex items-center gap-6 text-lg">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
+                            <span className="text-white/80">{getArenaByTrophies(player.trophies).name}</span>
+                          </div>
+                          {player.clan && (
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 bg-fuchsia-400 rounded-full"></div>
+                              <span className="text-white/80">{player.clan}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                     
-                    <div className="bg-bg-dark/50 rounded-lg p-4 border border-border-dark/50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-sm">👑</div>
+                    <div className="flex items-center gap-6">
+                      <div className="text-right">
+                        <div className="text-5xl md:text-6xl font-bold text-gradient mb-2">{player.trophies.toLocaleString()}</div>
+                        <div className="text-white/70 text-lg">Troféus Atuais</div>
+                        <div className="text-white/50 mt-2">Melhor: {player.bestTrophies.toLocaleString()}</div>
+                      </div>
+                      
+                      <button
+                        onClick={refreshData}
+                        disabled={isRefreshing}
+                        className="btn-ios flex items-center gap-2"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        {isRefreshing ? 'Atualizando...' : 'Atualizar'}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {lastUpdated && (
+                    <div className="text-sm text-white/50 flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        Atualização: {lastUpdated.toLocaleString('pt-BR', {
+                          timeZone: 'America/Sao_Paulo',
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tabs Navigation */}
+              <div className="glass float mb-8">
+                <div className="flex">
+                  {[
+                    { id: 'resumo', label: 'Resumo', icon: <BarChart3 className="w-5 h-5" /> },
+                    { id: 'historico', label: 'Histórico', icon: <Calendar className="w-5 h-5" /> },
+                    { id: 'estatisticas', label: 'Estatísticas', icon: <Trophy className="w-5 h-5" /> },
+                    { id: 'live', label: 'Ao Vivo', icon: <Zap className="w-5 h-5" /> }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-3 px-8 py-4 font-medium transition-all duration-200 rounded-2xl ${
+                        activeTab === tab.id
+                          ? 'bg-white/10 text-white'
+                          : 'text-white/60 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              {activeTab === 'resumo' && player && summary && (
+                <div className="space-y-8">
+                  <LeagueInfo player={player} />
+                  <SessionHistory battles={battles} />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <TrophyChart series={summary.series} />
+                    <div className="glass-dark float p-8">
+                      <div className="flex items-center gap-4 mb-8">
+                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center">
+                          <Award className="w-7 h-7 text-white" />
+                        </div>
                         <div>
-                          <div className="font-semibold text-white">3 Coroas Master</div>
-                          <div className="text-sm text-gray-400">{player.threeCrownWins?.toLocaleString() || 0} vitórias com 3 coroas</div>
+                          <h2 className="text-2xl font-bold text-white">Conquistas Recentes</h2>
+                          <p className="text-white/70">Últimos marcos alcançados</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="glass p-6 hover-lift">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gold rounded-2xl flex items-center justify-center text-lg">🏆</div>
+                            <div>
+                              <div className="text-lg font-semibold text-white">Novo Recorde Pessoal</div>
+                              <div className="text-white/70">{player.bestTrophies.toLocaleString()} troféus</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="glass p-6 hover-lift">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-lg">👑</div>
+                            <div>
+                              <div className="text-lg font-semibold text-white">3 Coroas Master</div>
+                              <div className="text-white/70">{player.threeCrownWins?.toLocaleString() || 0} vitórias com 3 coroas</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
 
-          {activeTab === 'historico' && (
-            <div className="space-y-6">
-              <SessionHistory battles={battles} />
-              <BattleHistory battles={battles} />
-            </div>
-          )}
+              {activeTab === 'historico' && (
+                <div className="space-y-8">
+                  <BattleHistory battles={battles} />
+                </div>
+              )}
 
-          {activeTab === 'estatisticas' && player && summary && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-card-dark border border-border-dark rounded-xl p-6">
-                  <h3 className="font-bold text-lg text-white mb-4">Performance Geral</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Total de Vitórias</span>
-                      <span className="text-emerald-400 font-bold">{player.wins?.toLocaleString() || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Total de Derrotas</span>
-                      <span className="text-rose-400 font-bold">{player.losses?.toLocaleString() || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Win Rate Geral</span>
-                      <span className="text-gold font-bold">
-                        {player.wins && player.losses ? 
-                          Math.round((player.wins / (player.wins + player.losses)) * 100) : 0}%
-                      </span>
-                    </div>
+              {activeTab === 'estatisticas' && player && summary && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="glass-dark float p-8 text-center">
+                    <TrendingUp className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
+                    <div className="text-3xl font-bold text-emerald-400 mb-2">{summary.winRate}%</div>
+                    <div className="text-white/70">Win Rate</div>
+                    <div className="text-sm text-white/50 mt-2">{summary.wins}W / {summary.losses}L</div>
+                  </div>
+                  <div className="glass-dark float p-8 text-center">
+                    <Crown className="w-10 h-10 text-gold mx-auto mb-4" />
+                    <div className="text-3xl font-bold text-gold mb-2">{player.threeCrownWins?.toLocaleString() || '0'}</div>
+                    <div className="text-white/70">3 Coroas</div>
+                  </div>
+                  <div className="glass-dark float p-8 text-center">
+                    <Trophy className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
+                    <div className="text-3xl font-bold text-fuchsia-400 mb-2">{player.bestTrophies?.toLocaleString() || '0'}</div>
+                    <div className="text-white/70">Melhor Temporada</div>
+                  </div>
+                  <div className="glass-dark float p-8 text-center">
+                    <Zap className="w-10 h-10 text-cyan-400 mx-auto mb-4" />
+                    <div className="text-3xl font-bold text-cyan-400 mb-2">{(summary.trophyDelta > 0 ? '+' : '') + summary.trophyDelta}</div>
+                    <div className="text-white/70">Push Atual</div>
+                    <div className="text-sm text-white/50 mt-2">{summary.matchesTotal} partidas</div>
                   </div>
                 </div>
-                
-                <div className="bg-card-dark border border-border-dark rounded-xl p-6">
-                  <h3 className="font-bold text-lg text-white mb-4">Sessão Atual</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Partidas Jogadas</span>
-                      <span className="text-white font-bold">{summary.matchesTotal}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Troféus Ganhos/Perdidos</span>
-                      <span className={`font-bold ${summary.trophyDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {summary.trophyDelta >= 0 ? '+' : ''}{summary.trophyDelta}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Win Rate da Sessão</span>
-                      <span className="text-gold font-bold">{summary.winRate}%</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-card-dark border border-border-dark rounded-xl p-6">
-                  <h3 className="font-bold text-lg text-white mb-4">Recordes</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Melhor Temporada</span>
-                      <span className="text-purple font-bold">{player.bestTrophies?.toLocaleString() || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Nível de Experiência</span>
-                      <span className="text-gold font-bold">{player.expLevel}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">3 Coroas</span>
-                      <span className="text-gold font-bold">{player.threeCrownWins?.toLocaleString() || 0}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <TrophyChart series={summary.series} />
-            </div>
-          )}
+              )}
 
-          {activeTab === 'live' && (
-            <div className="bg-card-dark border border-border-dark rounded-xl p-6">
-              <div className="text-center py-12">
-                <Zap className="w-16 h-16 text-royal mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Modo Ao Vivo</h3>
-                <p className="text-gray-400 mb-6">
-                  Acompanhe partidas em tempo real e estatísticas ao vivo
-                </p>
-                <div className="bg-bg-dark/50 rounded-lg p-4 border border-border-dark/50 max-w-md mx-auto">
-                  <div className="flex items-center justify-center gap-2 text-emerald-400">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                    <span className="text-sm">Monitoramento ativo</span>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    Dados atualizados automaticamente a cada 2 minutos
+              {activeTab === 'live' && (
+                <div className="glass-dark float p-12">
+                  <div className="text-center">
+                    <Zap className="w-20 h-20 text-cyan-400 mx-auto mb-6 floaty" />
+                    <h3 className="text-3xl font-bold text-white mb-4">Modo Ao Vivo</h3>
+                    <p className="text-xl text-white/70 mb-8 max-w-md mx-auto">
+                      Acompanhe partidas em tempo real e estatísticas ao vivo
+                    </p>
+                    <div className="glass p-6 max-w-md mx-auto">
+                      <div className="flex items-center justify-center gap-3 text-emerald-400">
+                        <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span>Monitoramento ativo</span>
+                      </div>
+                      <div className="text-sm text-white/50 mt-3">
+                        Dados atualizados automaticamente a cada 2 minutos
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
         </main>
       )}
 
       {/* Footer */}
-      <footer className="border-t border-border-dark bg-card-dark/50 mt-12">
-        <div className="max-w-6xl mx-auto px-6 py-8">
+      <footer className="relative border-t hairline bg-black/20 backdrop-blur-md mt-20">
+        <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-400">
-              Powered by <span className="text-royal">Supercell API</span> • Inspired by deep.gg
+            <div className="text-white/60">
+              Powered by <span className="text-cyan-400">Supercell API</span> • Inspired by Apple Design
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-white/40 text-sm">
               Next.js • Tailwind CSS • Recharts
             </div>
           </div>

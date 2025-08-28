@@ -1,15 +1,18 @@
 import './globals.css';
+import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+
 export const metadata: Metadata = {
-  title: 'Clash Royale Status',
-  description: 'DeepLOL-style Clash Royale player stats (Supercell API)'
+  title: 'ClashDex – iOS Style Stats',
+  description: 'Interface inspirada no iOS para estatísticas do Clash Royale'
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
-      <body className="bg-bg-dark text-white">{children}</body>
+    <html lang="pt-BR" className={inter.variable}>
+      <body className="font-sans bg-neutral-950 text-white antialiased">{children}</body>
     </html>
   );
 }
