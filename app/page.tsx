@@ -100,7 +100,7 @@ export default function Page() {
     if (showPlayerData && tag && !loading && !isRefreshing) {
       await refreshData();
     }
-  }, showPlayerData ? 60000 : undefined); // 1 minuto de auto-refresh
+  }, showPlayerData ? 300000 : undefined); // 5 minutos de auto-refresh
 
   const features = [
     {
