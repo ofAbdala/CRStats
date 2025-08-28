@@ -464,7 +464,7 @@ export default function Page() {
               {/* Tab Content */}
               {activeTab === 'resumo' && player && summary && (
                 <div className="space-y-8">
-                  <LeagueInfo player={player} />
+                  <LeagueInfo player={player} battles={battles} />
                   <SessionHistory battles={battles} />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <TrophyChart series={summary.series} />
