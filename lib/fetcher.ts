@@ -1,18 +1,15 @@
-// lib/fetcher.ts
 export async function fetchWithRetry(
   url: string,
   init: RequestInit = {},
   opts: { timeoutMs?: number; retries?: number } = {}
 ) {
-  const timeoutMs = opts.timeoutMs ?? 10000; // 10s
+  const timeoutMs = opts.timeoutMs ?? 10000;
   const retries = opts.retries ?? 2;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), timeoutMs);
-
     try {
-      console.log(`Fetch attempt ${attempt + 1}/${retries + 1} to: ${url}`);
       const res = await fetch(url, {
         ...init,
         cache: 'no-store',
@@ -20,27 +17,16 @@ export async function fetchWithRetry(
         headers: {
           Accept: 'application/json',
           'User-Agent': 'clash-next/1.0',
-          'Connection': 'close',
-          'Connection': 'close',
           ...(init.headers || {}),
         },
       });
       clearTimeout(t);
-
-      if (!res.ok) {
-        console.log(`HTTP ${res.status} response from ${url}`);
-        return res;
-      }
-      console.log(`Successful response from ${url}`);
       return res;
-    } catch (err) {
+    } catch (e) {
       clearTimeout(t);
-      console.error(`Fetch attempt ${attempt + 1} failed:`, err);
-      if (attempt === retries) throw err;
+      if (attempt === retries) throw e;
       const wait = 300 * (attempt + 1) + Math.floor(Math.random() * 200);
-      console.log(`Retrying in ${wait}ms...`);
-      console.log(`Retrying in ${wait}ms...`);
-      await new Promise(r => setTimeout(r, wait));
+      await new Promise((r) => setTimeout(r, wait));
     }
   }
   throw new Error('unreachable');

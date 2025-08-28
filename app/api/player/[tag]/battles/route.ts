@@ -14,7 +14,7 @@ export async function GET(req: Request, { params }: { params: { tag: string } })
     console.log('Fetching battles from:', url);
     console.log('BaseURL', baseURL(), process.env.USE_PROXY, !!process.env.SUPERCELL_TOKEN);
 
-    const r = await fetchWithRetry(url, { headers: authHeaders() }, { timeoutMs: 15000, retries: 3 });
+    const r = await fetchWithRetry(url, { headers: authHeaders() });
     if (!r.ok) {
       const msg = await r.text().catch(() => '');
       console.error('Supercell API error', r.status, msg);

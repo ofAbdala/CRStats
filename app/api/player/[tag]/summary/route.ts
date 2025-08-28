@@ -16,8 +16,8 @@ export async function GET(req: Request, { params }: { params: { tag: string } })
     console.log('BaseURL', baseURL(), process.env.USE_PROXY, !!process.env.SUPERCELL_TOKEN);
     
     const [p, b] = await Promise.all([
-      fetchWithRetry(`${baseURL()}/players/${tagEnc}`, { headers: authHeaders() }, { timeoutMs: 15000, retries: 3 }),
-      fetchWithRetry(`${baseURL()}/players/${tagEnc}/battlelog`, { headers: authHeaders() }, { timeoutMs: 15000, retries: 3 })
+      fetchWithRetry(`${baseURL()}/players/${tagEnc}`, { headers: authHeaders() }),
+      fetchWithRetry(`${baseURL()}/players/${tagEnc}/battlelog`, { headers: authHeaders() })
     ]);
 
     if (!p.ok) {
