@@ -342,22 +342,8 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
                       </div>
                       
                       {/* Oponentes */}
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center">
-                            <span className="text-xs text-white">👤</span>
-                          </div>
-                          <span className="text-sm text-blue-400">{battle.opponentName}</span>
-                        </div>
-                        {/* Adicionar mais oponentes simulados para parecer com a imagem */}
-                        {Array.from({ length: Math.floor(Math.random() * 3) + 1 }).map((_, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded bg-purple-600 flex items-center justify-center">
-                              <span className="text-xs text-white">👤</span>
-                            </div>
-                            <span className="text-sm text-purple-400">Player{i + 2}</span>
-                          </div>
-                        ))}
+                      <div className="flex items-center">
+                        <span className="text-sm text-blue-400">{battle.opponentName}</span>
                       </div>
                       
                       {/* Deck dos Oponentes */}
