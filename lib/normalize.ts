@@ -1,3 +1,5 @@
+import { brazilTime, toZoned, BRAZIL_TZ } from './time';
+
 export type BattleRow = any;
 
 export function normalizeBattleRow(row: any) {
@@ -6,9 +8,9 @@ export function normalizeBattleRow(row: any) {
   const tc   = team.crowns ?? 0, oc = opp.crowns ?? 0;
   const result = tc > oc ? 'WIN' : tc < oc ? 'LOSS' : 'DRAW';
 
-  // Converter battleTime para timestamp brasileiro
+  // Converter battleTime para horário brasileiro
   const battleDate = new Date(row.battleTime + 'Z');
-  const brazilTime = battleDate.toLocaleString('pt-BR', {
+  const battleTimeFormatted = battleDate.toLocaleString('pt-BR', {
     timeZone: 'America/Sao_Paulo',
     day: '2-digit',
     month: '2-digit',
@@ -16,8 +18,10 @@ export function normalizeBattleRow(row: any) {
     hour: '2-digit',
     minute: '2-digit'
   });
+  
   return {
     battleTime: row.battleTime,        // UTC string
+    battleTimeFormatted,               // Formatted for Brazil
     gameMode: row.gameMode?.name ?? '',
     result,
     crownsFor: tc,
@@ -65,11 +69,8 @@ export function computeSummary(player: any, battles: any[]) {
 
   return {
     tag: (player.tag || '').replace('#', ''),
-    battleTimeFormatted: brazilTime,   // Formatado para Brasil
-    battleTimestamp: battleDate.getTime(), // Timestamp para cálculos
     name: player.name,
     trophiesNow: player.trophies,
-    gameModeId: row.gameMode?.id ?? 0,
     trophiesStart: start,
     trophyDelta: player.trophies - start,
     matchesTotal: windowRows.length,
@@ -78,12 +79,6 @@ export function computeSummary(player: any, battles: any[]) {
     opponentTrophies: opp.startingTrophies ?? 0,
     winRate: windowRows.length ? Math.round((wins / windowRows.length) * 100) : 0,
     pushDurationMs,
-    trophyChange: team.trophyChange ?? 0,
-    teamStartingTrophies: team.startingTrophies ?? 0,
-    deckSelection: row.deckSelection ?? 'collection',
-    type: row.type ?? 'PvP',
-    isLadderTournament: row.isLadderTournament ?? false,
-    arena: row.arena?.name ?? '',
-    arenaId: row.arena?.id ?? 0
+    series
   };
 }
