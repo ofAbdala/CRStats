@@ -126,11 +126,28 @@ export default function Page() {
     }
   ];
 
-  const popularPlayers = [
-    { tag: "U9UUCCQ", name: "Exemplo 1", trophies: "6500+" },
-    { tag: "2PP", name: "Exemplo 2", trophies: "7200+" },
-    { tag: "8QU8J9LP", name: "Exemplo 3", trophies: "5800+" }
-  ];
+  // Extrai jogadores únicos das batalhas carregadas
+  const getPopularPlayersFromBattles = () => {
+    if (!battles.length) return [];
+    
+    const uniquePlayers = new Map();
+    
+    battles.forEach(battle => {
+      // Adiciona o oponente se não existir
+      if (battle.opponentTag && battle.opponentName && !uniquePlayers.has(battle.opponentTag)) {
+        uniquePlayers.set(battle.opponentTag, {
+          tag: battle.opponentTag,
+          name: battle.opponentName,
+          trophies: battle.opponentTrophies ? `${battle.opponentTrophies.toLocaleString()}` : "N/A"
+        });
+      }
+    });
+    
+    // Retorna até 6 jogadores únicos
+    return Array.from(uniquePlayers.values()).slice(0, 6);
+  };
+
+  const popularPlayers = getPopularPlayersFromBattles();
 
   return (
     <div className="min-h-screen bg-bg-dark">
@@ -252,13 +269,14 @@ export default function Page() {
           </section>
 
           {/* Popular Players Section */}
-          <section className="py-16 px-6">
+          {popularPlayers.length > 0 && (
+            <section className="py-16 px-6">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">Jogadores Populares</h2>
-              <p className="text-gray-400">Confira as estatísticas de alguns jogadores em destaque</p>
+              <h2 className="text-3xl font-bold text-white mb-4">Jogadores Recentes</h2>
+              <p className="text-gray-400">Oponentes encontrados nas últimas batalhas</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {popularPlayers.map((player, index) => (
                 <button
                   key={index}
@@ -270,20 +288,21 @@ export default function Page() {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-gold to-yellow-500 rounded-xl flex items-center justify-center">
-                      <Trophy className="w-6 h-6 text-black" />
+                      <span className="text-lg">👤</span>
                     </div>
                     <div>
                       <div className="font-semibold text-white group-hover:text-royal transition-colors">
                         {player.name}
                       </div>
                       <div className="text-sm text-gray-400">#{player.tag}</div>
-                      <div className="text-sm text-gold">{player.trophies} troféus</div>
+                      <div className="text-sm text-gold">{player.trophies !== "N/A" ? `${player.trophies} troféus` : "Troféus não disponíveis"}</div>
                     </div>
                   </div>
                 </button>
               ))}
             </div>
           </section>
+          )}
 
           {/* Stats Preview */}
           <section className="py-16 px-6 bg-card-dark/30">
