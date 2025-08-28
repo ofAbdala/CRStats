@@ -6,6 +6,12 @@ const nextConfig = {
   },
   experimental: {
     serverActions: { allowedOrigins: ['*'] }
+  },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.cache = false; // força recompilar sem cache para evitar erros ENOENT
+    }
+    return config;
   }
 };
 
