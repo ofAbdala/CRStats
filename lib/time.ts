@@ -41,12 +41,26 @@ export function formatDateTime(
   if (!d || isNaN(d.getTime())) return '--';
   
   const z = toZoned(d, tz);
-  return new Intl.DateTimeFormat('pt-BR', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-    ...opts,
+  
+  // Check if opts contains individual date/time components
+  const hasIndividualComponents = opts && (
+    'year' in opts || 'month' in opts || 'day' in opts ||
+    'hour' in opts || 'minute' in opts || 'second' in opts ||
+    'weekday' in opts || 'era' in opts || 'timeZoneName' in opts
+  );
+  
+  const formatOptions: Intl.DateTimeFormatOptions = {
     timeZone: tz,
-  }).format(z);
+    ...opts,
+  };
+  
+  // Only add dateStyle/timeStyle if no individual components are specified
+  if (!hasIndividualComponents && !opts) {
+    formatOptions.dateStyle = 'short';
+    formatOptions.timeStyle = 'short';
+  }
+  
+  return new Intl.DateTimeFormat('pt-BR', formatOptions).format(z);
 }
 
 export function formatDateOnly(
