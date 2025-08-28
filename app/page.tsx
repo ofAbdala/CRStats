@@ -98,9 +98,10 @@ export default function Page() {
   // Auto-refresh a cada 2 minutos quando há dados carregados
   usePolling(async () => {
     if (showPlayerData && tag && !loading && !isRefreshing) {
-      await refreshData();
+      // Comentado para desabilitar auto-refresh
+      // await refreshData();
     }
-  }, showPlayerData ? 300000 : undefined); // 5 minutos de auto-refresh
+  }, undefined); // Auto-refresh desabilitado
 
   const features = [
     {
