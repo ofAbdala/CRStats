@@ -147,22 +147,3 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
     </div>
   );
 }
-        {currentArena.type === 'seasonal' && (
-          <span className="text-orange-400">
-            ⚡ Arena Sazonal: ±150 troféus por vitória/derrota
-          </span>
-        )}
-        {currentArena.type === 'competitive' && (
-          <span className="text-fuchsia-400">
-            💎 Modo Competitivo: Sistema ranqueado avançado
-          </span>
-        )}
-        {currentArena.type === 'fixed' && (
-          <span>
-            📊 Arena Fixa: ±30 troféus por vitória/derrota
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
