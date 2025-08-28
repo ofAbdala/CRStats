@@ -49,13 +49,20 @@ export function formatDateTime(
     'weekday' in opts || 'era' in opts || 'timeZoneName' in opts
   );
   
+  // Check if opts contains any valid formatting options
+  const hasValidOptions = opts && (
+    hasIndividualComponents ||
+    'dateStyle' in opts || 'timeStyle' in opts ||
+    'localeMatcher' in opts || 'formatMatcher' in opts
+  );
+  
   const formatOptions: Intl.DateTimeFormatOptions = {
     timeZone: tz,
     ...opts,
   };
   
-  // Only add dateStyle/timeStyle if no individual components are specified
-  if (!hasIndividualComponents && !opts) {
+  // Only add dateStyle/timeStyle if no individual components are specified and no valid options exist
+  if (!hasIndividualComponents && !hasValidOptions) {
     formatOptions.dateStyle = 'short';
     formatOptions.timeStyle = 'short';
   }
