@@ -76,7 +76,6 @@ export function computeSummary(player: any, battles: any[]) {
     matchesTotal: windowRows.length,
     wins,
     losses,
-    opponentTrophies: opp.startingTrophies ?? 0,
     winRate: windowRows.length ? Math.round((wins / windowRows.length) * 100) : 0,
     pushDurationMs,
     series
