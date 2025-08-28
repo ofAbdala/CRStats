@@ -1,4 +1,4 @@
-// Sistema completo de arenas do Clash Royale (2024)
+// Sistema completo de arenas do Clash Royale com nomes corretos das arenas
 const ARENAS = [
   { id: 1, name: "Training Camp", minTrophies: 0, maxTrophies: 99, icon: "🏕️", color: "from-gray-400 to-gray-600" },
   { id: 2, name: "Goblin Stadium", minTrophies: 100, maxTrophies: 399, icon: "👹", color: "from-green-400 to-green-600" },
@@ -20,13 +20,15 @@ const ARENAS = [
   { id: 18, name: "Dragon Spa", minTrophies: 5300, maxTrophies: 5599, icon: "🐲", color: "from-green-600 to-green-800" },
   { id: 19, name: "Electro Wizard's Lair", minTrophies: 5600, maxTrophies: 5999, icon: "🧙‍♂️", color: "from-purple-600 to-purple-800" },
   { id: 20, name: "Legendary Arena", minTrophies: 6000, maxTrophies: 6499, icon: "🏆", color: "from-yellow-500 to-yellow-700" },
-  { id: 21, name: "Master I", minTrophies: 6500, maxTrophies: 6999, icon: "💎", color: "from-cyan-500 to-cyan-700" },
-  { id: 22, name: "Master II", minTrophies: 7000, maxTrophies: 7499, icon: "💎", color: "from-blue-500 to-blue-700" },
-  { id: 23, name: "Master III", minTrophies: 7500, maxTrophies: 7999, icon: "💎", color: "from-purple-500 to-purple-700" },
-  { id: 24, name: "Champion", minTrophies: 8000, maxTrophies: 8499, icon: "👑", color: "from-gold to-yellow-600" },
-  { id: 25, name: "Grand Champion", minTrophies: 8500, maxTrophies: 8999, icon: "🏅", color: "from-orange-500 to-red-500" },
-  { id: 26, name: "Royal Champion", minTrophies: 9000, maxTrophies: 9499, icon: "👑", color: "from-purple-500 to-pink-500" },
-  { id: 27, name: "Ultimate Champion", minTrophies: 9500, maxTrophies: 99999, icon: "🏆", color: "from-yellow-400 to-orange-500" }
+  
+  // Ligas com nomes das arenas (não ranks)
+  { id: 21, name: "Challenger", minTrophies: 6500, maxTrophies: 6999, icon: "⚔️", color: "from-cyan-500 to-cyan-700" },
+  { id: 22, name: "Master", minTrophies: 7000, maxTrophies: 7499, icon: "🛡️", color: "from-blue-500 to-blue-700" },
+  { id: 23, name: "Champion", minTrophies: 7500, maxTrophies: 7999, icon: "👑", color: "from-purple-500 to-purple-700" },
+  { id: 24, name: "Grand Champion", minTrophies: 8000, maxTrophies: 8499, icon: "🏅", color: "from-gold to-yellow-600" },
+  { id: 25, name: "Royal Champion", minTrophies: 8500, maxTrophies: 8999, icon: "👑", color: "from-orange-500 to-red-500" },
+  { id: 26, name: "Ultimate Champion", minTrophies: 9000, maxTrophies: 9499, icon: "🏆", color: "from-purple-500 to-pink-500" },
+  { id: 27, name: "Legendary Champion", minTrophies: 9500, maxTrophies: 99999, icon: "🌟", color: "from-yellow-400 to-orange-500" }
 ];
 
 function getCurrentArena(trophies: number) {
@@ -79,9 +81,9 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="text-xl font-bold text-white">{currentArena.name}</h3>
-            {currentArena.id <= 20 && (
-              <span className="text-sm text-gray-400">Arena {currentArena.id}</span>
-            )}
+            <span className="text-sm text-gray-400">
+              {currentArena.minTrophies.toLocaleString()} - {currentArena.maxTrophies === 99999 ? '∞' : currentArena.maxTrophies.toLocaleString()} LP
+            </span>
           </div>
           
           <div className="text-lg font-bold text-gold mb-1">
@@ -106,9 +108,9 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-white">{nextArena.name}</div>
-                  {nextArena.id <= 20 && (
-                    <div className="text-xs text-gray-400">Arena {nextArena.id}</div>
-                  )}
+                  <div className="text-xs text-gray-400">
+                    {nextArena.minTrophies.toLocaleString()} LP
+                  </div>
                 </div>
               </div>
               <div className="text-lg font-bold text-royal">
@@ -118,7 +120,7 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
           ) : (
             <div className="text-center">
               <div className="text-sm text-gold mb-1">🏆 Arena Máxima</div>
-              <div className="text-lg font-bold text-gold">Ultimate Champion</div>
+              <div className="text-lg font-bold text-gold">Legendary Champion</div>
             </div>
           )}
         </div>
@@ -131,7 +133,7 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
           {nextArena && (
             <span>Faltam {trophiesUntilNext} LP para {nextArena.name}</span>
           )}
-          <span>{currentArena.maxTrophies.toLocaleString()} LP</span>
+          <span>{currentArena.maxTrophies === 99999 ? '∞' : currentArena.maxTrophies.toLocaleString()} LP</span>
         </div>
         <div className="h-3 bg-bg-dark rounded-full overflow-hidden border border-border-dark">
           <div 
@@ -142,9 +144,9 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
           </div>
         </div>
         <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>Arena {currentArena.id}</span>
+          <span>{currentArena.name}</span>
           {nextArena && (
-            <span>{nextArena.id <= 20 ? `Arena ${nextArena.id}` : nextArena.name}</span>
+            <span>{nextArena.name}</span>
           )}
         </div>
       </div>
