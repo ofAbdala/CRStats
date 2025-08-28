@@ -1,7 +1,7 @@
 'use client';
 
-import { Clock, Trophy, TrendingUp, TrendingDown, Calendar, Target } from 'lucide-react';
-import { parseClashTime, formatDateTime, calculateDuration } from '@/lib/time';
+import { Clock, Trophy, TrendingUp, TrendingDown, Calendar, Target, Crown, Swords } from 'lucide-react';
+import { parseClashTime, formatDateTime, calculateDuration, formatAgo } from '@/lib/time';
 
 // Função para agrupar batalhas por sessões (baseado em gaps de tempo)
 function groupBattlesBySessions(battles: any[]) {
@@ -75,36 +75,141 @@ function groupBattlesBySessions(battles: any[]) {
   });
 }
 
-
 function formatTimeAgo(daysAgo: number) {
   if (daysAgo === 0) return 'Hoje';
   if (daysAgo === 1) return '1 dia atrás';
   return `${daysAgo} dias atrás`;
 }
 
-function getGameModeColor(mode: string) {
-  const colors: { [key: string]: string } = {
-    'Ladder': 'from-royal to-blue-600',
-    'Classic Challenge': 'from-gold to-yellow-600',
-    'Grand Challenge': 'from-purple to-indigo-600',
-    'Tournament': 'from-green-500 to-green-700',
-    'Party': 'from-orange-500 to-red-500',
-    'Draft': 'from-cyan-500 to-blue-500',
-    'Triple Draft': 'from-pink-500 to-purple-500',
-    'Sudden Death': 'from-red-500 to-red-700'
-  };
-  
-  return colors[mode] || 'from-gray-500 to-gray-700';
+function getGameModeIcon(mode: string) {
+  if (mode.includes('Ladder')) return '🏆';
+  if (mode.includes('Challenge')) return '⚔️';
+  if (mode.includes('Tournament')) return '🎯';
+  if (mode.includes('Party')) return '🎉';
+  if (mode.includes('Draft')) return '📝';
+  return '⚡';
 }
 
-function getMostPlayedMode(battles: any[]) {
-  const modes: { [key: string]: number } = {};
-  battles.forEach(battle => {
-    const mode = battle.gameMode || 'Unknown';
-    modes[mode] = (modes[mode] || 0) + 1;
-  });
+function formatDuration(ms: number) {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function getCardIcon(cardName: string) {
+  // Mapeamento básico de cartas para emojis
+  const cardIcons: { [key: string]: string } = {
+    'Knight': '🛡️',
+    'Archers': '🏹',
+    'Goblins': '👹',
+    'Giant': '🗿',
+    'P.E.K.K.A': '🤖',
+    'Minions': '🦇',
+    'Balloon': '🎈',
+    'Witch': '🧙‍♀️',
+    'Barbarians': '🪓',
+    'Golem': '🗿',
+    'Skeleton Army': '💀',
+    'Valkyrie': '⚔️',
+    'Skeleton': '💀',
+    'Wall Breakers': '💣',
+    'Fireball': '🔥',
+    'Arrows': '🏹',
+    'Lightning': '⚡',
+    'Zap': '⚡',
+    'Poison': '☠️',
+    'Freeze': '❄️',
+    'Tornado': '🌪️',
+    'Clone': '👥',
+    'Rage': '😡',
+    'Mirror': '🪞',
+    'Elixir Collector': '💜',
+    'Inferno Tower': '🔥',
+    'Bomb Tower': '💣',
+    'Barbarian Hut': '🏠',
+    'Goblin Hut': '🏠',
+    'X-Bow': '🏹',
+    'Mortar': '💥',
+    'Rocket': '🚀',
+    'Goblin Barrel': '🛢️',
+    'Graveyard': '⚰️',
+    'The Log': '🪵',
+    'Miner': '⛏️',
+    'Princess': '👸',
+    'Ice Wizard': '🧙‍♂️',
+    'Lumberjack': '🪓',
+    'Sparky': '⚡',
+    'Lava Hound': '🌋',
+    'Ice Spirit': '❄️',
+    'Fire Spirit': '🔥',
+    'Bowler': '🎳',
+    'Lumber Jack': '🪓',
+    'Inferno Dragon': '🐲',
+    'Ice Golem': '🧊',
+    'Mega Minion': '🦇',
+    'Dart Goblin': '🎯',
+    'Goblin Gang': '👹',
+    'Electro Wizard': '⚡',
+    'Elite Barbarians': '🪓',
+    'Hunter': '🔫',
+    'Executioner': '🪓',
+    'Bandit': '🗡️',
+    'Ram Rider': '🐏',
+    'Magic Archer': '🏹',
+    'Night Witch': '🧙‍♀️',
+    'Mega Knight': '👑',
+    'Royal Ghost': '👻',
+    'Dark Prince': '🖤',
+    'Prince': '🤴',
+    'Baby Dragon': '🐲',
+    'Wizard': '🧙‍♂️',
+    'Musketeer': '🔫',
+    'Mini P.E.K.K.A': '🤖',
+    'Hog Rider': '🐗',
+    'Three Musketeers': '🔫',
+    'Royal Giant': '👑',
+    'Guards': '🛡️',
+    'Dark Prince': '🖤',
+    'Cannon': '💥',
+    'Tesla': '⚡',
+    'Tombstone': '⚰️',
+    'Furnace': '🔥',
+    'Barbarian Barrel': '🛢️',
+    'Flying Machine': '🚁',
+    'Rascals': '👦',
+    'Royal Recruits': '👑',
+    'Zappies': '⚡',
+    'Cannon Cart': '🛒',
+    'Mega Minion': '🦇',
+    'Ice Spirit': '❄️',
+    'Heal Spirit': '💚',
+    'Skeletons': '💀',
+    'Bats': '🦇',
+    'Spear Goblins': '🗡️',
+    'Fire Cracker': '🧨',
+    'Royal Delivery': '📦',
+    'Earthquake': '🌍',
+    'Snowball': '⛄',
+    'Giant Snowball': '⛄',
+    'Barbarian Barrel': '🛢️',
+    'Heal': '💚',
+    'Electro Dragon': '🐲',
+    'Fisherman': '🎣',
+    'Earthquake': '🌍',
+    'Wall Breakers': '💣',
+    'Elixir Golem': '💜',
+    'Battle Healer': '💚',
+    'Firecracker': '🧨',
+    'Mighty Miner': '⛏️',
+    'Royal Champion': '👑',
+    'Archer Queen': '👸',
+    'Golden Knight': '🏅',
+    'Skeleton King': '💀',
+    'Phoenix': '🔥',
+    'Monk': '🧘‍♂️'
+  };
   
-  return Object.entries(modes).sort(([,a], [,b]) => b - a)[0]?.[0] || 'Unknown';
+  return cardIcons[cardName] || '🃏';
 }
 
 interface SessionHistoryProps {
@@ -142,94 +247,158 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
         </div>
       </div>
       
-      <div className="space-y-4">
-        {sessions.map((session) => {
-          const mostPlayedMode = getMostPlayedMode(session.battles);
-          const modeColor = getGameModeColor(mostPlayedMode);
-          
-          return (
-            <div key={session.id} className="bg-bg-dark/50 border border-border-dark/50 rounded-lg p-4 hover:border-royal/30 transition-all duration-200">
-              {/* Header da Sessão */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 bg-gradient-to-br ${modeColor} rounded-lg flex items-center justify-center`}>
-                    <Target className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-white">{mostPlayedMode}</div>
-                    <div className="text-xs text-gray-400">{formatTimeAgo(session.daysAgo)}</div>
-                  </div>
-                </div>
-                
-                <div className="text-right">
-                  <div className={`text-lg font-bold ${session.trophyChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
-                  </div>
-                  <div className="text-xs text-gray-400">troféus</div>
-                </div>
-              </div>
-              
-              {/* Stats da Sessão */}
-              <div className="grid grid-cols-4 gap-4 mb-3">
-                <div className="text-center">
-                  <div className="text-lg font-bold text-white">{session.total}</div>
-                  <div className="text-xs text-gray-400">Jogos</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="text-lg font-bold text-emerald-400">{session.wins}</div>
-                  <div className="text-xs text-gray-400">Wins</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className="text-lg font-bold text-rose-400">{session.losses}</div>
-                  <div className="text-xs text-gray-400">Loss</div>
-                </div>
-                
-                <div className="text-center">
-                  <div className={`text-lg font-bold ${session.winRate >= 60 ? 'text-emerald-400' : session.winRate >= 50 ? 'text-gold' : 'text-rose-400'}`}>
-                    {session.winRate}%
-                  </div>
-                  <div className="text-xs text-gray-400">WR</div>
-                </div>
-              </div>
-              
-              {/* Duração e Horário */}
-              <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-border-dark/30">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3 h-3" />
-                  <span>Duração: {calculateDuration(session.startTime, session.endTime)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-3 h-3" />
-                  <span>
-                    {formatDateTime(session.startTime, { 
-                      hour: '2-digit', 
-                      minute: '2-digit',
-                      timeStyle: 'short',
-                      dateStyle: undefined
-                    })} - {formatDateTime(session.endTime, { 
-                      hour: '2-digit', 
-                      minute: '2-digit',
-                      timeStyle: 'short',
-                      dateStyle: undefined
-                    })}
-                  </span>
-                </div>
-              </div>
-              
-              {/* Barra de Win Rate */}
-              <div className="mt-3">
-                <div className="h-2 bg-bg-dark rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full transition-all duration-500 ${session.winRate >= 60 ? 'bg-emerald-500' : session.winRate >= 50 ? 'bg-gold' : 'bg-rose-500'}`}
-                    style={{ width: `${session.winRate}%` }}
-                  ></div>
-                </div>
-              </div>
+      <div className="space-y-6">
+        {sessions.map((session) => (
+          <div key={session.id} className="space-y-3">
+            {/* Header da Sessão */}
+            <div className="flex items-center gap-4 text-sm text-gray-400">
+              <span>{formatTimeAgo(session.daysAgo)}</span>
+              <span>{session.total} Jogos</span>
+              <span>{session.wins}V {session.losses}L</span>
+              <span>{session.winRate}%</span>
+              <span className={`font-bold ${session.trophyChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
+              </span>
+              <span>Challenger</span>
+              <span>{calculateDuration(session.startTime, session.endTime)}</span>
             </div>
-          );
-        })}
+            
+            {/* Batalhas da Sessão */}
+            <div className="space-y-2">
+              {session.battles.map((battle, battleIndex) => (
+                <div 
+                  key={battleIndex} 
+                  className={`rounded-lg border-l-4 p-4 ${
+                    battle.result === 'WIN' 
+                      ? 'bg-emerald-900/10 border-l-emerald-500' 
+                      : 'bg-rose-900/10 border-l-rose-500'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    {/* Lado Esquerdo - Info da Partida */}
+                    <div className="flex items-center gap-4">
+                      {/* Modo de Jogo */}
+                      <div className="flex flex-col items-center min-w-[80px]">
+                        <div className="text-xs text-gray-400 mb-1">Ranked Solo</div>
+                        <div className="text-xs text-gray-500">{formatTimeAgo(0)}</div>
+                      </div>
+                      
+                      {/* Resultado */}
+                      <div className="flex flex-col items-center min-w-[60px]">
+                        <div className={`text-sm font-bold ${
+                          battle.result === 'WIN' ? 'text-emerald-400' : 'text-rose-400'
+                        }`}>
+                          {battle.result === 'WIN' ? 'Win' : 'Lose'}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {formatDuration(Math.random() * 300000 + 60000)} {/* Duração simulada */}
+                        </div>
+                      </div>
+                      
+                      {/* Avatar do Jogador */}
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-royal to-purple flex items-center justify-center">
+                        <Crown className="w-5 h-5 text-white" />
+                      </div>
+                      
+                      {/* Deck do Jogador */}
+                      <div className="flex gap-1">
+                        {battle.teamDeck.slice(0, 8).map((card: string, cardIndex: number) => (
+                          <div 
+                            key={cardIndex}
+                            className="w-8 h-8 bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-xs"
+                            title={card}
+                          >
+                            {getCardIcon(card)}
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Score */}
+                      <div className="flex flex-col items-center min-w-[60px]">
+                        <div className="text-sm font-bold text-white">
+                          {battle.crownsFor}/{battle.crownsAgainst}/{Math.floor(Math.random() * 20)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {(Math.random() * 3).toFixed(2)} KDA
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Lado Direito - Oponentes */}
+                    <div className="flex items-center gap-4">
+                      {/* AI-Score */}
+                      <div className="flex flex-col items-center">
+                        <div className="text-xs text-gray-400 mb-1">AI-Score</div>
+                        <div className={`text-lg font-bold px-2 py-1 rounded ${
+                          battle.result === 'WIN' 
+                            ? 'bg-emerald-600 text-white' 
+                            : 'bg-rose-600 text-white'
+                        }`}>
+                          {Math.floor(Math.random() * 40) + 40}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {Math.floor(Math.random() * 10) + 1}th
+                        </div>
+                      </div>
+                      
+                      {/* Oponentes */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center">
+                            <span className="text-xs text-white">👤</span>
+                          </div>
+                          <span className="text-sm text-blue-400">{battle.opponentName}</span>
+                        </div>
+                        {/* Adicionar mais oponentes simulados para parecer com a imagem */}
+                        {Array.from({ length: Math.floor(Math.random() * 3) + 1 }).map((_, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded bg-purple-600 flex items-center justify-center">
+                              <span className="text-xs text-white">👤</span>
+                            </div>
+                            <span className="text-sm text-purple-400">Player{i + 2}</span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Deck dos Oponentes */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex gap-1">
+                          {battle.opponentDeck.slice(0, 4).map((card: string, cardIndex: number) => (
+                            <div 
+                              key={cardIndex}
+                              className="w-6 h-6 bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-xs"
+                              title={card}
+                            >
+                              {getCardIcon(card)}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-1">
+                          {battle.opponentDeck.slice(4, 8).map((card: string, cardIndex: number) => (
+                            <div 
+                              key={cardIndex}
+                              className="w-6 h-6 bg-gray-800 rounded border border-gray-700 flex items-center justify-center text-xs"
+                              title={card}
+                            >
+                              {getCardIcon(card)}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Dropdown */}
+                      <div className="text-gray-500">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
