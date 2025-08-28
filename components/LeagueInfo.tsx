@@ -30,7 +30,7 @@ const ARENAS = [
 ];
 
 function getCurrentArena(trophies: number) {
-  return ARENAS.find(arena => trophies >= arena.minTrophies && trophies <= arena.maxTrophies) || ARENAS[0];
+  return ARENAS.find(arena => trophies >= arena.minTrophies && trophies <= arena.maxTrophies) || ARENAS[ARENAS.length - 1];
 }
 
 function getNextArena(trophies: number) {
@@ -79,7 +79,9 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="text-xl font-bold text-white">{currentArena.name}</h3>
-            <span className="text-sm text-gray-400">Arena {currentArena.id}</span>
+            {currentArena.id <= 20 && (
+              <span className="text-sm text-gray-400">Arena {currentArena.id}</span>
+            )}
           </div>
           
           <div className="text-lg font-bold text-gold mb-1">
@@ -104,7 +106,9 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-white">{nextArena.name}</div>
-                  <div className="text-xs text-gray-400">Arena {nextArena.id}</div>
+                  {nextArena.id <= 20 && (
+                    <div className="text-xs text-gray-400">Arena {nextArena.id}</div>
+                  )}
                 </div>
               </div>
               <div className="text-lg font-bold text-royal">
@@ -139,7 +143,9 @@ export default function LeagueInfo({ player }: LeagueInfoProps) {
         </div>
         <div className="flex justify-between text-xs text-gray-500 mt-1">
           <span>Arena {currentArena.id}</span>
-          {nextArena && <span>Arena {nextArena.id}</span>}
+          {nextArena && (
+            <span>{nextArena.id <= 20 ? `Arena ${nextArena.id}` : nextArena.name}</span>
+          )}
         </div>
       </div>
     </div>
