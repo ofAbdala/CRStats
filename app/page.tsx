@@ -69,13 +69,6 @@ export default function Page() {
     } finally { setLoading(false); }
   }
 
-  // Auto-load default player on mount
-  useEffect(() => {
-    if (!player && !loading && !err && !tag) {
-      loadDefaultPlayer();
-    }
-  }, [player, loading, err, tag]);
-
   function onSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
