@@ -300,9 +300,13 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
                       
                       {/* AI-Score */}
                       <div className="flex flex-col items-center ml-2">
-                        <div className="text-xs text-gray-400 mb-1">AI-Score</div>
-                        <div className={`text-lg font-bold px-2 py-1 rounded ${getAIScoreColor(calculateAIScore(battle))}`}>
-                          {calculateAIScore(battle)}
+                        <div className="text-xs text-gray-400 mb-1">Troféus</div>
+                        <div className={`text-lg font-bold px-2 py-1 rounded ${
+                          battle.trophyChange > 0 ? 'bg-emerald-600 text-white' :
+                          battle.trophyChange < 0 ? 'bg-rose-600 text-white' :
+                          'bg-gray-600 text-white'
+                        }`}>
+                          {battle.trophyChange > 0 ? '+' : ''}{battle.trophyChange}
                         </div>
                       </div>
                     </div>
