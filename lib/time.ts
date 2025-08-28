@@ -56,9 +56,19 @@ export function formatDateTime(
     'localeMatcher' in opts || 'formatMatcher' in opts
   );
   
+  // Filter out undefined values from opts to prevent "Invalid option" errors
+  const cleanOpts: Intl.DateTimeFormatOptions = {};
+  if (opts) {
+    Object.entries(opts).forEach(([key, value]) => {
+      if (value !== undefined) {
+        (cleanOpts as any)[key] = value;
+      }
+    });
+  }
+  
   const formatOptions: Intl.DateTimeFormatOptions = {
     timeZone: tz,
-    ...opts,
+    ...cleanOpts,
   };
   
   // Only add dateStyle/timeStyle if no individual components are specified and no valid options exist
