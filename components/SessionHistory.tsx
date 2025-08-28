@@ -212,6 +212,53 @@ function getCardIcon(cardName: string) {
   return cardIcons[cardName] || '🃏';
 }
 
+// Função para calcular AI-Score baseado na performance
+function calculateAIScore(battle: any) {
+  let score = 50; // Base score
+  
+  // Resultado da partida (maior peso)
+  if (battle.result === 'WIN') {
+    score += 25;
+  } else if (battle.result === 'LOSS') {
+    score -= 25;
+  }
+  
+  // Torres destruídas pelo jogador
+  score += battle.crownsFor * 8;
+  
+  // Torres perdidas (penalidade)
+  score -= battle.crownsAgainst * 6;
+  
+  // Troféus ganhos/perdidos
+  if (battle.trophyChange > 0) {
+    score += Math.min(battle.trophyChange / 3, 15); // Max +15 por troféus
+  } else {
+    score += Math.max(battle.trophyChange / 2, -20); // Max -20 por troféus perdidos
+  }
+  
+  // Bonus para 3 coroas
+  if (battle.crownsFor === 3) {
+    score += 10;
+  }
+  
+  // Penalty se perdeu sem destruir nenhuma torre
+  if (battle.crownsFor === 0 && battle.result === 'LOSS') {
+    score -= 10;
+  }
+  
+  // Garante que o score fica entre 0 e 100
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+// Função para definir cor do AI-Score
+function getAIScoreColor(score: number) {
+  if (score >= 80) return 'bg-emerald-600 text-white';
+  if (score >= 65) return 'bg-blue-600 text-white';
+  if (score >= 50) return 'bg-yellow-600 text-black';
+  if (score >= 35) return 'bg-orange-600 text-white';
+  return 'bg-rose-600 text-white';
+}
+
 interface SessionHistoryProps {
   battles: any[];
 }
@@ -316,10 +363,10 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
                       {/* Score */}
                       <div className="flex flex-col items-center min-w-[60px]">
                         <div className="text-sm font-bold text-white">
-                          {battle.crownsFor}/{battle.crownsAgainst}/{Math.floor(Math.random() * 20)}
+                          {battle.crownsFor}/{battle.crownsAgainst}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {(Math.random() * 3).toFixed(2)} KDA
+                          Torres destruídas
                         </div>
                       </div>
                     </div>
@@ -329,16 +376,10 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
                       {/* AI-Score */}
                       <div className="flex flex-col items-center">
                         <div className="text-xs text-gray-400 mb-1">AI-Score</div>
-                        <div className={`text-lg font-bold px-2 py-1 rounded ${
-                          battle.result === 'WIN' 
-                            ? 'bg-emerald-600 text-white' 
-                            : 'bg-rose-600 text-white'
-                        }`}>
-                          {Math.floor(Math.random() * 40) + 40}
+                        <div className={`text-lg font-bold px-2 py-1 rounded ${getAIScoreColor(calculateAIScore(battle))}`}>
+                          {calculateAIScore(battle)}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {Math.floor(Math.random() * 10) + 1}th
-                        </div>
+                        <div className="text-xs text-gray-500 mt-1">Performance</div>
                       </div>
                       
                       {/* Oponentes */}
