@@ -1,23 +1,15 @@
-import { brazilTime, toZoned, BRAZIL_TZ } from './time';
+import { parseClashTime, formatDateTime, BRAZIL_TZ } from './time';
 
 export type BattleRow = any;
 
 export function normalizeBattleRow(row: any) {
   const team = row?.team?.[0] ?? {};
-  const opp  = row?.opponent?.[0] ?? {};
-  const tc   = team.crowns ?? 0, oc = opp.crowns ?? 0;
+  const opponent = row?.opponent?.[0] ?? {};
+  const tc = team.crowns ?? 0, oc = opponent.crowns ?? 0;
   const result = tc > oc ? 'WIN' : tc < oc ? 'LOSS' : 'DRAW';
 
-  // Converter battleTime para horário brasileiro
-  const battleDate = new Date(row.battleTime + 'Z');
-  const battleTimeFormatted = battleDate.toLocaleString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  // Usar parser seguro para datas da Supercell API
+  const battleTimeFormatted = formatDateTime(row.battleTime);
   
   return {
     battleTime: row.battleTime,        // UTC string
@@ -26,17 +18,28 @@ export function normalizeBattleRow(row: any) {
     result,
     crownsFor: tc,
     crownsAgainst: oc,
-    opponentName: opp.name ?? '',
-    opponentTag: (opp.tag ?? '').replace('#', ''),
+    opponentName: opponent.name ?? '',
+    opponentTag: (opponent.tag ?? '').replace('#', ''),
+    opponentTrophies: opponent.startingTrophies ?? 0,
     teamDeck: (team.cards || []).map((c: any) => c.name),
-    opponentDeck: (opp.cards || []).map((c: any) => c.name),
+    opponentDeck: (opponent.cards || []).map((c: any) => c.name),
     trophyChange: team.trophyChange ?? 0
   };
 }
 
 export function computeSummary(player: any, battles: any[]) {
-  const newestFirst = battles;               // API já retorna do mais novo → mais antigo
-  const windowRows  = newestFirst;           // já fatiado no route
+  // Filtrar e ordenar batalhas usando parser seguro
+  const validBattles = battles
+    .filter(b => parseClashTime(b.battleTime)) // Remove batalhas com data inválida
+    .sort((a, b) => {
+      const dateA = parseClashTime(a.battleTime);
+      const dateB = parseClashTime(b.battleTime);
+      if (!dateA || !dateB) return 0;
+      return dateB.getTime() - dateA.getTime(); // Mais recente primeiro
+    });
+
+  const newestFirst = validBattles;
+  const windowRows = newestFirst;
   const oldestFirst = [...windowRows].reverse();
 
   // Reconstrói troféus de início da janela
@@ -48,8 +51,7 @@ export function computeSummary(player: any, battles: any[]) {
   for (const b of oldestFirst) {
     t += (b.trophyChange || 0);
     series.push({
-      label: new Date(b.battleTime + 'Z').toLocaleString('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
+      label: formatDateTime(b.battleTime, { 
         day: '2-digit',
         month: '2-digit',
         hour: '2-digit',
@@ -63,9 +65,15 @@ export function computeSummary(player: any, battles: any[]) {
   const losses = windowRows.filter(b => b.result === 'LOSS').length;
   const firstT = oldestFirst[0]?.battleTime;
   const lastT  = oldestFirst[oldestFirst.length - 1]?.battleTime;
-  const pushDurationMs = (firstT && lastT)
-    ? (new Date(lastT + 'Z').getTime() - new Date(firstT + 'Z').getTime())
-    : 0;
+  
+  let pushDurationMs = 0;
+  if (firstT && lastT) {
+    const firstDate = parseClashTime(firstT);
+    const lastDate = parseClashTime(lastT);
+    if (firstDate && lastDate) {
+      pushDurationMs = lastDate.getTime() - firstDate.getTime();
+    }
+  }
 
   return {
     tag: (player.tag || '').replace('#', ''),

@@ -1,6 +1,7 @@
 'use client';
 
 import { Clock, Trophy, TrendingUp, TrendingDown, Calendar, Target } from 'lucide-react';
+import { parseClashTime, formatDateTime, calculateDuration } from '@/lib/time';
 
 // Função para agrupar batalhas por sessões (baseado em gaps de tempo)
 function groupBattlesBySessions(battles: any[]) {
@@ -12,13 +13,21 @@ function groupBattlesBySessions(battles: any[]) {
   
   for (let i = 0; i < battles.length; i++) {
     const battle = battles[i];
-    const battleTime = new Date(battle.battleTime + 'Z');
+    const battleTime = parseClashTime(battle.battleTime);
+    
+    if (!battleTime) continue; // Pula batalhas com data inválida
     
     if (currentSession.length === 0) {
       currentSession.push(battle);
     } else {
       const lastBattle = currentSession[currentSession.length - 1];
-      const lastBattleTime = new Date(lastBattle.battleTime + 'Z');
+      const lastBattleTime = parseClashTime(lastBattle.battleTime);
+      
+      if (!lastBattleTime) {
+        currentSession.push(battle);
+        continue;
+      }
+      
       const timeDiff = (lastBattleTime.getTime() - battleTime.getTime()) / (1000 * 60 * 60);
       
       if (timeDiff > SESSION_GAP_HOURS) {
@@ -43,11 +52,11 @@ function groupBattlesBySessions(battles: any[]) {
     
     const trophyChange = sessionBattles.reduce((sum, b) => sum + (b.trophyChange || 0), 0);
     
-    const startTime = new Date(sessionBattles[sessionBattles.length - 1].battleTime + 'Z');
-    const endTime = new Date(sessionBattles[0].battleTime + 'Z');
-    const duration = endTime.getTime() - startTime.getTime();
+    const startTime = parseClashTime(sessionBattles[sessionBattles.length - 1].battleTime);
+    const endTime = parseClashTime(sessionBattles[0].battleTime);
+    const duration = (startTime && endTime) ? endTime.getTime() - startTime.getTime() : 0;
     
-    const daysAgo = Math.floor((Date.now() - endTime.getTime()) / (1000 * 60 * 60 * 24));
+    const daysAgo = endTime ? Math.floor((Date.now() - endTime.getTime()) / (1000 * 60 * 60 * 24)) : 0;
     
     return {
       id: index,
@@ -66,15 +75,6 @@ function groupBattlesBySessions(battles: any[]) {
   });
 }
 
-function formatDuration(ms: number) {
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  return `${minutes}m`;
-}
 
 function formatTimeAgo(daysAgo: number) {
   if (daysAgo === 0) return 'Hoje';
@@ -198,19 +198,21 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
               <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-border-dark/30">
                 <div className="flex items-center gap-2">
                   <Clock className="w-3 h-3" />
-                  <span>Duração: {formatDuration(session.duration)}</span>
+                  <span>Duração: {calculateDuration(session.startTime, session.endTime)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-3 h-3" />
                   <span>
-                    {session.startTime.toLocaleString('pt-BR', { 
-                      timeZone: 'America/Sao_Paulo',
+                    {formatDateTime(session.startTime, { 
                       hour: '2-digit', 
-                      minute: '2-digit' 
-                    })} - {session.endTime.toLocaleString('pt-BR', { 
-                      timeZone: 'America/Sao_Paulo',
+                      minute: '2-digit',
+                      timeStyle: 'short',
+                      dateStyle: undefined
+                    })} - {formatDateTime(session.endTime, { 
                       hour: '2-digit', 
-                      minute: '2-digit' 
+                      minute: '2-digit',
+                      timeStyle: 'short',
+                      dateStyle: undefined
                     })}
                   </span>
                 </div>

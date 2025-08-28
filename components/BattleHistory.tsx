@@ -1,6 +1,7 @@
 'use client';
 
 import { Clock, Trophy, Crown, Swords } from 'lucide-react';
+import { formatAgo, formatDateTime } from '@/lib/time';
 
 function rowColor(result: string) {
   return result === 'WIN' ? 'bg-emerald-900/20 border-emerald-900/30'
@@ -17,19 +18,7 @@ function getGameModeIcon(mode: string) {
   return '⚡';
 }
 
-function formatTimeAgo(battleTime: string) {
-  const now = new Date();
-  const battle = new Date(battleTime + 'Z');
-  const diffMs = now.getTime() - battle.getTime();
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-  
-  if (diffMinutes < 1) return 'Agora mesmo';
-  if (diffMinutes < 60) return `${diffMinutes}m atrás`;
-  if (diffHours < 24) return `${diffHours}h atrás`;
-  return `${diffDays}d atrás`;
-}
+
 export default function BattleHistory({ battles }: { battles: any[] }) {
   return (
     <div className="bg-card-dark border border-border-dark rounded-xl p-6">
@@ -66,20 +55,20 @@ export default function BattleHistory({ battles }: { battles: any[] }) {
             
             <div className="text-right">
               <div className={`text-lg font-bold ${b.trophyChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {b.opponentTrophies > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Trophy className="w-3 h-3" />
-                      <span>{b.opponentTrophies}</span>
-                    </div>
-                  )}
                 {b.trophyChange >= 0 ? '+' : ''}{b.trophyChange}
               </div>
+              {b.opponentTrophies > 0 && (
+                <div className="flex items-center gap-1 justify-end text-xs text-gray-500 mt-1">
+                  <Trophy className="w-3 h-3" />
+                  <span>{b.opponentTrophies}</span>
+                </div>
+              )}
               <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                <span>{formatTimeAgo(b.battleTime)}</span>
+                <span>{formatAgo(b.battleTime)}</span>
               </div>
               <div className="text-xs text-gray-600 mt-1">
-                {b.battleTimeFormatted}
+                {formatDateTime(b.battleTime)}
               </div>
             </div>
           </div>
