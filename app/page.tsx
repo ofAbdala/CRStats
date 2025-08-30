@@ -466,43 +466,8 @@ export default function Page() {
               {activeTab === 'resumo' && player && summary && (
                 <div className="space-y-8">
                   <LeagueInfo player={player} battles={battles} />
+                  <TrophyChart series={summary.series} battles={battles} player={player} />
                   <SessionHistory battles={battles} />
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <TrophyChart series={summary.series} battles={battles} player={player} />
-                    <div className="glass-dark float p-8">
-                      <div className="flex items-center gap-4 mb-8">
-                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center">
-                          <Award className="w-7 h-7 text-white" />
-                        </div>
-                        <div>
-                          <h2 className="text-2xl font-bold text-white">Conquistas Recentes</h2>
-                          <p className="text-white/70">Últimos marcos alcançados</p>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="glass p-6 hover-lift">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gold rounded-2xl flex items-center justify-center text-lg">🏆</div>
-                            <div>
-                              <div className="text-lg font-semibold text-white">Novo Recorde Pessoal</div>
-                              <div className="text-white/70">{player.bestTrophies.toLocaleString()} troféus</div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="glass p-6 hover-lift">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-lg">👑</div>
-                            <div>
-                              <div className="text-lg font-semibold text-white">3 Coroas Master</div>
-                              <div className="text-white/70">{player.threeCrownWins?.toLocaleString() || 0} vitórias com 3 coroas</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
 

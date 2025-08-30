@@ -24,17 +24,34 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
 
   // Calcula estimativas para próxima arena
   const trophiesNeeded = nextArena ? nextArena.minTrophies - player.trophies : 0;
-  const estimatedMatches = avgTrophiesPerMatch > 0 ? Math.ceil(trophiesNeeded / avgTrophiesPerMatch) : 0;
   
-  // Calcula tempo estimado baseado na frequência de batalhas
-  const averageTimeBetweenBattles = battles.length > 1 ? 
-    (Date.now() - new Date(battles[battles.length - 1].time).getTime()) / (battles.length - 1) : 
-    1800000; // 30 min default
+  // Calcula partidas estimadas baseado no win rate
+  let estimatedMatches = 0;
+  if (nextArena && trophiesNeeded > 0) {
+    // Usa win rate para estimar quantas vitórias são necessárias
+    // Assume média de +30 troféus por vitória e -20 por derrota
+    const avgWinTrophies = 30;
+    const avgLossTrophies = -20;
+    const expectedTrophiesPerGame = (recentWinRate / 100) * avgWinTrophies + (1 - recentWinRate / 100) * avgLossTrophies;
+    
+    if (expectedTrophiesPerGame > 0) {
+      estimatedMatches = Math.ceil(trophiesNeeded / expectedTrophiesPerGame);
+    } else {
+      estimatedMatches = 999; // Impossível subir com win rate muito baixo
+    }
+  }
   
-  const estimatedTimeHours = (estimatedMatches * averageTimeBetweenBattles) / (1000 * 60 * 60);
+  // Calcula tempo estimado (média de 4 minutos por partida)
+  const avgMinutesPerMatch = 4; // Tempo médio por partida do Clash Royale
+  const totalMinutes = estimatedMatches * avgMinutesPerMatch;
+  
+  const estimatedTimeHours = totalMinutes / 60;
   
   // Função para formatar tempo estimado
   const formatEstimatedTime = (hours: number) => {
+    if (hours > 168) { // Mais de 1 semana
+      return `${Math.round(hours / 24 / 7)}sem`;
+    }
     if (hours < 1) {
       return `${Math.round(hours * 60)}min`;
     } else if (hours < 24) {
@@ -119,13 +136,18 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
                 <div className="text-white/50 text-xs">
                   ~<span className="font-bold text-orange-400">{estimatedMatches}</span> partidas
                 </div>
-                {estimatedTimeHours > 0 && (
+                {estimatedMatches < 999 && estimatedTimeHours > 0 && (
                   <>
                     <span className="hidden sm:inline text-white/30">•</span>
                     <div className="text-white/50 text-xs">
                       <span className="font-bold text-blue-400">{formatEstimatedTime(estimatedTimeHours)}</span>
                     </div>
                   </>
+                )}
+                {estimatedMatches >= 999 && (
+                  <div className="text-rose-400 text-xs font-bold">
+                    Melhore win rate para subir
+                  </div>
                 )}
               </div>
             </div>
