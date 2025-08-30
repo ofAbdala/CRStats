@@ -223,12 +223,21 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
               {session.battles.map((battle, battleIndex) => (
                 <div 
                   key={battleIndex} 
-                  className={`glass-dark border-l-4 p-3 sm:p-4 hover-lift ${
-                    battle.result === 'WIN' 
-                      ? 'border-l-emerald-500' 
-                      : 'border-l-rose-500'
+                  className={`${
+                    battle.result === 'WIN' && battle.crownsFor === 3
+                      ? 'match-card win'
+                      : `glass-dark border-l-4 p-3 sm:p-4 hover-lift ${
+                          battle.result === 'WIN' 
+                            ? 'border-l-emerald-500' 
+                            : 'border-l-rose-500'
+                        }`
                   }`}
                 >
+                  {/* Spotlight effect para 3-crown wins */}
+                  {battle.result === 'WIN' && battle.crownsFor === 3 && (
+                    <div className="spotlight"></div>
+                  )}
+                  
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center sm:justify-between">
                     {/* Lado Esquerdo - Modo e Resultado */}
                     <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">

@@ -34,11 +34,20 @@ export default function BattleHistory({ battles }: { battles: any[] }) {
       
       <div className="space-y-3">
         {battles.map((b, i) => (
-          <div key={i} className={`glass-dark border-l-4 p-3 sm:p-4 hover-lift ${
-            b.result === 'WIN' ? 'border-l-emerald-500' : 
-            b.result === 'LOSS' ? 'border-l-rose-500' : 
-            'border-l-gray-500'
+          <div key={i} className={`${
+            b.result === 'WIN' && b.crownsFor === 3
+              ? 'match-card win'
+              : `glass-dark border-l-4 p-3 sm:p-4 hover-lift ${
+                  b.result === 'WIN' ? 'border-l-emerald-500' : 
+                  b.result === 'LOSS' ? 'border-l-rose-500' : 
+                  'border-l-gray-500'
+                }`
           }`}>
+            {/* Spotlight effect para 3-crown wins */}
+            {b.result === 'WIN' && b.crownsFor === 3 && (
+              <div className="spotlight"></div>
+            )}
+            
             {/* Mobile: Layout vertical compacto */}
             <div className="block sm:hidden">
               <div className="flex items-center justify-between mb-2">
