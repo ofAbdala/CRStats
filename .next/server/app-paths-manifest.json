@@ -1,7 +1,3 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/api/player/[tag]/route": "app/api/player/[tag]/route.js",
-  "/api/player/[tag]/summary/route": "app/api/player/[tag]/summary/route.js",
-  "/api/player/[tag]/battles/route": "app/api/player/[tag]/battles/route.js"
+  "/page": "app/page.js"
 }

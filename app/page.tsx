@@ -1,27 +1,6 @@
 'use client';
 
-// Timer shims to prevent t._onTimeout errors in Bolt environment
-if (typeof window !== 'undefined') {
-  const _setInterval = window.setInterval;
-  const _setTimeout = window.setTimeout;
-
-  window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: any[]) => {
-    if (typeof handler !== 'function') {
-      const fn = () => (handler as any)?.();
-      return _setInterval(fn, Number(timeout) || 0, ...args);
-    }
-    return _setInterval(handler, Number(timeout) || 0, ...args);
-  }) as typeof window.setInterval;
-
-  window.setTimeout = ((handler: TimerHandler, timeout?: number, ...args: any[]) => {
-    if (typeof handler !== 'function') {
-      const fn = () => (handler as any)?.();
-      return _setTimeout(fn, Number(timeout) || 0, ...args);
-    }
-    return _setTimeout(handler, Number(timeout) || 0, ...args);
-  }) as typeof window.setTimeout;
-}
-
+import '@/lib/timer-shims';
 import { useEffect, useState } from 'react';
 import { Search, TrendingUp, Trophy, Users, Zap, Crown, Target, BarChart3, RefreshCw, Star, Calendar, Clock, Award } from 'lucide-react';
 import PlayerHeader from '@/components/PlayerHeader';
@@ -162,7 +141,7 @@ export default function Page() {
     if (showPlayerData && tag && !loading && !isRefreshing && activeTab === 'live') {
       await refreshData();
     }
-  }, activeTab === 'live' ? 60000 : undefined); // 1 minuto apenas na aba live</action>
+  }, activeTab === 'live' ? 60000 : undefined); // 1 minuto apenas na aba live
 
   const features = [
     {
@@ -717,63 +696,65 @@ export default function Page() {
 
                   {/* Monitoramento */}
                   {liveData?.isActive && liveData?.currentSession && liveData.currentSession.battles > 0 && (
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-                        <RefreshCw className={`w-7 h-7 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-white">Monitoramento</h2>
-                        <p className="text-white/70">Verificação automática de novas batalhas</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="glass p-4">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                          <span className="text-white font-medium">Auto-Refresh Ativo</span>
+                    <div className="glass-dark float p-6 sm:p-8">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                          <RefreshCw className={`w-7 h-7 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
                         </div>
-                        <div className="text-sm text-white/70 space-y-1">
-                          <p>• Verifica novas batalhas a cada 1 minuto</p>
-                          <p>• Detecta atividade em tempo real</p>
-                          <p>• Atualiza estatísticas automaticamente</p>
+                        <div>
+                          <h2 className="text-2xl font-bold text-white">Monitoramento</h2>
+                          <p className="text-white/70">Verificação automática de novas batalhas</p>
                         </div>
                       </div>
                       
-                      <div className="glass p-4">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Clock className="w-5 h-5 text-blue-400" />
-                          <span className="text-white font-medium">Última Verificação</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="glass p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                            <span className="text-white font-medium">Auto-Refresh Ativo</span>
+                          </div>
+                          <div className="text-sm text-white/70 space-y-1">
+                            <p>• Verifica novas batalhas a cada 1 minuto</p>
+                            <p>• Detecta atividade em tempo real</p>
+                            <p>• Atualiza estatísticas automaticamente</p>
+                          </div>
                         </div>
-                        <div className="text-sm text-white/70">
-                          {lastUpdated ? lastUpdated.toLocaleString('pt-BR', {
-                            timeZone: 'America/Sao_Paulo',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                          }) : '--'}
-                        </div>
-                        <div className="text-xs text-white/50 mt-2">
-                          {isRefreshing ? 'Verificando agora...' : 'Próxima em ~1 min'}
+                        
+                        <div className="glass p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Clock className="w-5 h-5 text-blue-400" />
+                            <span className="text-white font-medium">Última Verificação</span>
+                          </div>
+                          <div className="text-sm text-white/70">
+                            {lastUpdated ? lastUpdated.toLocaleString('pt-BR', {
+                              timeZone: 'America/Sao_Paulo',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit'
+                            }) : '--'}
+                          </div>
+                          <div className="text-xs text-white/50 mt-2">
+                            {isRefreshing ? 'Verificando agora...' : 'Próxima em ~1 min'}
+                          </div>
                         </div>
                       </div>
+                      
+                      <div className="mt-6 pt-6 border-t border-white/10">
+                        <button
+                          onClick={refreshData}
+                          disabled={isRefreshing}
+                          className="w-full glass-dark p-4 rounded-xl hover:bg-white/5 transition-all duration-200 disabled:opacity-50"
+                        >
+                          <div className="flex items-center justify-center gap-3">
+                            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                            <span className="font-medium">
+                              {isRefreshing ? 'Verificando Novas Batalhas...' : 'Verificar Agora'}
+                            </span>
+                          </div>
+                        </button>
+                      </div>
                     </div>
-                    
-                    <div className="mt-6 pt-6 border-t border-white/10">
-                      <button
-                        onClick={refreshData}
-                        disabled={isRefreshing}
-                        className="w-full glass-dark p-4 rounded-xl hover:bg-white/5 transition-all duration-200 disabled:opacity-50"
-                      >
-                        <div className="flex items-center justify-center gap-3">
-                          <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                          <span className="font-medium">
-                            {isRefreshing ? 'Verificando Novas Batalhas...' : 'Verificar Agora'}
-                          </span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
