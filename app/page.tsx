@@ -14,9 +14,22 @@ import { getArenaByTrophies } from '@/lib/arenas';
 import { parseClashTime, formatDateTime } from '@/lib/time';
 
 async function fetchJson(url: string) {
-  const r = await fetch(url, { cache: 'no-store' });
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  } catch (e: any) {
+    if (e?.name === 'AbortError') {
+      // ignore silenciosamente (navegação/refresh pode cancelar fetch)
+      return null;
+    }
+    throw e;
+  }
+      return null;
+    }
+    throw e;
+  }
+}
 }
 
 export default function Page() {
