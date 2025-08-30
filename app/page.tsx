@@ -190,7 +190,7 @@ export default function Page() {
                 </div>
 
                 {/* Search Form */}
-                <div className="max-w-lg mx-auto mb-12">
+                <div className="max-w-lg mx-auto mb-8 sm:mb-12">
                   <form onSubmit={onSearch}>
                     <div className="glass float p-2">
                       <div className="relative">
@@ -200,28 +200,28 @@ export default function Page() {
                           value={tag}
                           onChange={(e) => setTag(e.target.value)}
                           placeholder="Digite sua TAG (#XXXXXXX)"
-                          className="w-full pl-12 pr-4 py-4 bg-transparent text-white placeholder:text-white/50 focus:outline-none text-center text-lg"
+                          className="w-full pl-12 pr-4 py-3 sm:py-4 bg-transparent text-white placeholder:text-white/50 focus:outline-none text-center text-base sm:text-lg"
                         />
                       </div>
                     </div>
                     <button 
                       type="submit"
                       disabled={loading}
-                      className="w-full mt-4 glass float px-8 py-4 text-white font-semibold transition-all duration-200 hover:brightness-110 disabled:opacity-50"
+                      className="w-full mt-3 sm:mt-4 glass float px-6 sm:px-8 py-3 sm:py-4 text-white font-semibold transition-all duration-200 hover:brightness-110 disabled:opacity-50"
                     >
                       {loading ? 'Buscando...' : 'Buscar Jogador'}
                     </button>
                   </form>
 
                   {/* Quick Demo Button */}
-                  <div className="text-center mt-6">
+                  <div className="text-center mt-4 sm:mt-6">
                     <button 
                       onClick={loadDefaultPlayer}
                       className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
                     >
                       Ver exemplo com jogador demo →
                     </button>
-                    <div className="text-sm text-white/50 mt-2">
+                    <div className="text-xs sm:text-sm text-white/50 mt-2">
                       Ou digite qualquer TAG de jogador (ex: #2PP, #8QU8J9LP)
                     </div>
                   </div>
@@ -372,26 +372,28 @@ export default function Page() {
             <div className="max-w-7xl mx-auto">
               {/* Player Header */}
               {player && (
-                <div className="glass-dark float p-8 mb-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-6">
-                      <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-cyan-400 to-fuchsia-500 flex items-center justify-center text-4xl border-2 border-white/10 float">
+                <div className="glass-dark float p-4 sm:p-8 mb-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-6">
+                    <div className="flex items-center gap-3 sm:gap-6">
+                      <div className="w-16 sm:w-24 h-16 sm:h-24 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-cyan-400 to-fuchsia-500 flex items-center justify-center text-2xl sm:text-4xl border-2 border-white/10 float">
                         👑
                       </div>
                       <div>
-                        <div className="flex items-center gap-4 mb-3">
-                          <h1 className="text-4xl md:text-5xl font-bold text-white">{player.name}</h1>
-                          <span className="text-xl text-white/60 font-mono">#{player.tag}</span>
-                          <Star className="w-6 h-6 text-gold" />
-                        </div>
-                        <div className="flex items-center gap-6 text-lg">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mb-2 sm:mb-3">
+                          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white">{player.name}</h1>
                           <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
+                            <span className="text-base sm:text-xl text-white/60 font-mono">#{player.tag}</span>
+                            <Star className="w-4 sm:w-6 h-4 sm:h-6 text-gold" />
+                          </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm sm:text-lg">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 sm:w-3 h-2 sm:h-3 bg-cyan-400 rounded-full"></div>
                             <span className="text-white/80">{getArenaByTrophies(player.trophies).name}</span>
                           </div>
                           {player.clan && (
                             <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 bg-fuchsia-400 rounded-full"></div>
+                              <div className="w-2 sm:w-3 h-2 sm:h-3 bg-fuchsia-400 rounded-full"></div>
                               <span className="text-white/80">{player.clan}</span>
                             </div>
                           )}
@@ -399,17 +401,17 @@ export default function Page() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
-                        <div className="text-5xl md:text-6xl font-bold text-gradient mb-2">{player.trophies.toLocaleString()}</div>
-                        <div className="text-white/70 text-lg">Troféus Atuais</div>
-                        <div className="text-white/50 mt-2">Melhor: {player.bestTrophies.toLocaleString()}</div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                      <div className="text-center sm:text-right flex-shrink-0">
+                        <div className="text-3xl sm:text-4xl md:text-6xl font-bold text-gradient mb-1 sm:mb-2">{player.trophies.toLocaleString()}</div>
+                        <div className="text-white/70 text-sm sm:text-base lg:text-lg">Troféus Atuais</div>
+                        <div className="text-white/50 text-xs sm:text-sm mt-1 sm:mt-2">Melhor: {player.bestTrophies.toLocaleString()}</div>
                       </div>
                       
                       <button
                         onClick={refreshData}
                         disabled={isRefreshing}
-                        className="btn-ios flex items-center gap-2"
+                        className="btn-ios flex items-center justify-center gap-2 w-full sm:w-auto"
                       >
                         <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                         {isRefreshing ? 'Atualizando...' : 'Atualizar'}
@@ -418,7 +420,7 @@ export default function Page() {
                   </div>
                   
                   {lastUpdated && (
-                    <div className="text-sm text-white/50 flex items-center gap-2">
+                    <div className="text-xs sm:text-sm text-white/50 flex items-center justify-center sm:justify-start gap-2">
                       <Clock className="w-4 h-4" />
                       <span>
                         Atualização: {lastUpdated.toLocaleString('pt-BR', {
@@ -437,7 +439,7 @@ export default function Page() {
 
               {/* Tabs Navigation */}
               <div className="glass float mb-8">
-                <div className="flex">
+                <div className="flex overflow-x-auto">
                   {[
                     { id: 'resumo', label: 'Resumo', icon: <BarChart3 className="w-5 h-5" /> },
                     { id: 'historico', label: 'Histórico', icon: <Calendar className="w-5 h-5" /> },
@@ -447,14 +449,14 @@ export default function Page() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-3 px-8 py-4 font-medium transition-all duration-200 rounded-2xl ${
+                      className={`flex items-center gap-2 sm:gap-3 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-medium transition-all duration-200 rounded-2xl whitespace-nowrap ${
                         activeTab === tab.id
                           ? 'bg-white/10 text-white'
                           : 'text-white/60 hover:text-white hover:bg-white/5'
                       }`}
                     >
                       {tab.icon}
-                      {tab.label}
+                      <span className="text-sm sm:text-base">{tab.label}</span>
                     </button>
                   ))}
                 </div>
@@ -516,28 +518,28 @@ export default function Page() {
                   <TrophyChart series={summary.series} battles={battles} player={player} />
                   
                   {/* Grid de Estatísticas */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="glass-dark float p-8 text-center">
-                      <TrendingUp className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">{summary.winRate}%</div>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                    <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
+                      <TrendingUp className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-emerald-400 mx-auto mb-2 sm:mb-4" />
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-400 mb-1 sm:mb-2">{summary.winRate}%</div>
                       <div className="text-white/70">Win Rate</div>
-                      <div className="text-sm text-white/50 mt-2">{summary.wins}W / {summary.losses}L</div>
+                      <div className="text-xs sm:text-sm text-white/50 mt-1 sm:mt-2">{summary.wins}W / {summary.losses}L</div>
                     </div>
-                    <div className="glass-dark float p-8 text-center">
-                      <Crown className="w-10 h-10 text-gold mx-auto mb-4" />
-                      <div className="text-3xl font-bold text-gold mb-2">{player.threeCrownWins?.toLocaleString() || '0'}</div>
+                    <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
+                      <Crown className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-gold mx-auto mb-2 sm:mb-4" />
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gold mb-1 sm:mb-2">{player.threeCrownWins?.toLocaleString() || '0'}</div>
                       <div className="text-white/70">3 Coroas</div>
                     </div>
-                    <div className="glass-dark float p-8 text-center">
-                      <Trophy className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
-                      <div className="text-3xl font-bold text-fuchsia-400 mb-2">{player.bestTrophies?.toLocaleString() || '0'}</div>
+                    <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
+                      <Trophy className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-fuchsia-400 mx-auto mb-2 sm:mb-4" />
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-fuchsia-400 mb-1 sm:mb-2">{player.bestTrophies?.toLocaleString() || '0'}</div>
                       <div className="text-white/70">Melhor Temporada</div>
                     </div>
-                    <div className="glass-dark float p-8 text-center">
-                      <Zap className="w-10 h-10 text-cyan-400 mx-auto mb-4" />
-                      <div className="text-3xl font-bold text-cyan-400 mb-2">{(summary.trophyDelta > 0 ? '+' : '') + summary.trophyDelta}</div>
+                    <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
+                      <Zap className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-cyan-400 mx-auto mb-2 sm:mb-4" />
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-400 mb-1 sm:mb-2">{(summary.trophyDelta > 0 ? '+' : '') + summary.trophyDelta}</div>
                       <div className="text-white/70">Push Atual</div>
-                      <div className="text-sm text-white/50 mt-2">{summary.matchesTotal} partidas</div>
+                      <div className="text-xs sm:text-sm text-white/50 mt-1 sm:mt-2">{summary.matchesTotal} partidas</div>
                     </div>
                   </div>
                 </div>

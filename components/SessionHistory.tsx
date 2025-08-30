@@ -166,116 +166,104 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
   }
 
   return (
-    <div className="glass-dark float p-8">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/80 to-purple-600/80 rounded-2xl flex items-center justify-center">
-          <Clock className="w-7 h-7 text-white" />
+    <div className="glass-dark float p-4 sm:p-8">
+      <div className="flex items-center gap-3 mb-4 sm:mb-6">
+        <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-br from-indigo-500/80 to-purple-600/80 rounded-xl sm:rounded-2xl flex items-center justify-center">
+          <Clock className="w-6 sm:w-7 h-6 sm:h-7 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Histórico de Sessões</h2>
-          <p className="text-white/70">{sessions.length} sessões de jogo</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Histórico de Sessões</h2>
+          <p className="text-sm sm:text-base text-white/70">{sessions.length} sessões de jogo</p>
         </div>
       </div>
       
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {sessions.map((session) => (
           <div key={session.id} className="space-y-3">
             {/* Header da Sessão */}
-            <div className="flex items-center gap-4 text-sm text-white/70 glass rounded-2xl p-4">
-              <span className="font-medium">{formatTimeAgo(session.daysAgo)}</span>
-              <span>•</span>
-              <span>{session.total} Jogos</span>
-              <span>•</span>
-              <span>{session.wins}V {session.losses}L</span>
-              <span>•</span>
-              <span>{session.winRate}%</span>
-              <span>•</span>
-              <span className={`font-bold ${session.trophyChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
-              </span>
-              <span>•</span>
-              <span className="text-orange-400">{getArenaByTrophies(session.battles[0]?.opponentTrophies || 5000).name}</span>
-              <span>•</span>
-              <span className="text-blue-400">{formatSessionDuration(session.duration)}</span>
+            <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4">
+              {/* Mobile: Layout vertical */}
+              <div className="block sm:hidden space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-cyan-400 text-sm">{formatTimeAgo(session.daysAgo)}</span>
+                  <span className="text-blue-400 text-xs">{formatSessionDuration(session.duration)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-white/70">
+                  <span>{session.total} Jogos • {session.wins}V {session.losses}L • {session.winRate}%</span>
+                  <span className={`font-bold px-2 py-1 rounded ${session.trophyChange >= 0 ? 'bg-emerald-600/20 text-emerald-400' : 'bg-rose-600/20 text-rose-400'}`}>
+                    {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
+                  </span>
+                </div>
+                <div className="text-xs text-orange-400 truncate">{getArenaByTrophies(session.battles[0]?.opponentTrophies || 5000).name}</div>
+              </div>
+              
+              {/* Desktop: Layout horizontal original */}
+              <div className="hidden sm:flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-white/70">
+                <span className="font-medium text-cyan-400">{formatTimeAgo(session.daysAgo)}</span>
+                <span>•</span>
+                <span>{session.total} Jogos</span>
+                <span>•</span>
+                <span>{session.wins}V {session.losses}L</span>
+                <span>•</span>
+                <span>{session.winRate}%</span>
+                <span>•</span>
+                <span className={`font-bold ${session.trophyChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
+                </span>
+                <div className="w-full sm:w-auto"></div>
+                <span>•</span>
+                <span className="text-orange-400 truncate">{getArenaByTrophies(session.battles[0]?.opponentTrophies || 5000).name}</span>
+                <span>•</span>
+                <span className="text-blue-400">{formatSessionDuration(session.duration)}</span>
+              </div>
             </div>
             
             {/* Batalhas da Sessão */}
-            <div className="space-y-2">
+            <div className="space-y-2 sm:space-y-2">
               {session.battles.map((battle, battleIndex) => (
                 <div 
                   key={battleIndex} 
-                  className={`glass-dark border-l-4 p-4 hover-lift ${
+                  className={`glass-dark border-l-4 p-3 sm:p-4 hover-lift ${
                     battle.result === 'WIN' 
                       ? 'border-l-emerald-500' 
                       : 'border-l-rose-500'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center sm:justify-between">
                     {/* Lado Esquerdo - Modo e Resultado */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                       {/* Modo de Jogo e Tempo */}
-                      <div className="flex flex-col items-center min-w-[90px]">
-                        <div className="text-sm font-medium text-blue-400">Ranked Solo</div>
+                      <div className="flex flex-col sm:items-center min-w-[60px] sm:min-w-[90px]">
+                        <div className="text-xs sm:text-sm font-medium text-blue-400">Ladder</div>
                         <div className="text-xs text-gray-500">{formatAgo(battle.battleTime)}</div>
                       </div>
                       
                       {/* Resultado */}
-                      <div className="flex flex-col items-center min-w-[50px]">
-                        <div className={`text-sm font-bold ${
+                      <div className="flex flex-col sm:items-center min-w-[35px] sm:min-w-[50px]">
+                        <div className={`text-xs sm:text-sm font-bold ${
                           battle.result === 'WIN' ? 'text-emerald-400' : 'text-rose-400'
                         }`}>
                           {battle.result === 'WIN' ? 'Win' : 'Loss'}
                         </div>
-                        <div className="text-xs text-gray-500 font-mono">
-                          {Math.floor(Math.random() * 3) + 2}:{String(Math.floor(Math.random() * 60)).padStart(2, '0')}
-                        </div>
                       </div>
                       
                       {/* Torres Destruídas */}
-                      <div className="flex flex-col items-center min-w-[50px]">
-                        <div className="text-lg font-bold text-white">
+                      <div className="flex flex-col sm:items-center min-w-[35px] sm:min-w-[50px]">
+                        <div className="text-sm sm:text-lg font-bold text-white">
                           {battle.crownsFor}/{battle.crownsAgainst}
                         </div>
                         <div className="text-xs text-gray-500">Torres</div>
                       </div>
                       
-                      {/* Deck do Jogador */}
-                      <div className="flex gap-1 ml-2">
-                        {(battle.teamCards || []).slice(0, 8).map((card: any, cardIndex: number) => (
-                          <div 
-                            key={cardIndex}
-                            className="w-7 h-7 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
-                            title={card.name}
-                          >
-                            {card.iconUrls?.medium ? (
-                              <Image
-                                src={card.iconUrls.medium}
-                                alt={card.name}
-                                width={28}
-                                height={28}
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                                ?
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Lado Direito - Oponente e AI-Score */}
-                    <div className="flex items-center gap-4">
-                      {/* Nome do Oponente */}
-                      <div className="flex flex-col items-center min-w-[100px]">
-                        <div className="text-sm font-medium text-white">{battle.opponentName}</div>
-                        <div className="text-xs text-gray-500">vs</div>
+                      {/* Oponente (Mobile: Inline, Desktop: Separado) */}
+                      <div className="flex flex-col sm:hidden min-w-0 flex-1">
+                        <div className="text-xs sm:text-sm font-medium text-white truncate">vs {battle.opponentName}</div>
+                        <div className="text-xs text-gray-500">#{battle.opponentTag}</div>
                       </div>
                       
-                      {/* Deck dos Oponentes */}
-                      <div className="flex gap-1">
-                        {(battle.opponentCards || []).slice(0, 8).map((card: any, cardIndex: number) => (
+                      {/* Deck do Jogador (apenas desktop) */}
+                      <div className="hidden lg:flex gap-1 ml-2">
+                        {(battle.teamCards || []).slice(0, 8).map((card: any, cardIndex: number) => (
                           <div 
                             key={cardIndex}
                             className="w-6 h-6 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
@@ -297,18 +285,108 @@ export default function SessionHistory({ battles }: SessionHistoryProps) {
                           </div>
                         ))}
                       </div>
+                    </div>
+                    
+                    {/* Lado Direito - Oponente e AI-Score */}
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 flex-shrink-0">
+                      {/* Nome do Oponente (apenas desktop) */}
+                      <div className="hidden sm:flex flex-col items-center min-w-[80px] sm:min-w-[100px]">
+                        <div className="text-xs sm:text-sm font-medium text-white truncate max-w-[80px] sm:max-w-none">
+                          {battle.opponentName}
+                        </div>
+                        <div className="text-xs text-gray-500">vs</div>
+                      </div>
                       
-                      {/* AI-Score */}
-                      <div className="flex flex-col items-center ml-2">
-                        <div className="text-xs text-gray-400 mb-1">Troféus</div>
-                        <div className={`text-lg font-bold px-2 py-1 rounded ${
+                      {/* Deck dos Oponentes (apenas desktop) */}
+                      <div className="hidden lg:flex gap-1">
+                        {(battle.opponentCards || []).slice(0, 8).map((card: any, cardIndex: number) => (
+                          <div 
+                            key={cardIndex}
+                            className="w-5 h-5 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
+                            title={card.name}
+                          >
+                            {card.iconUrls?.medium ? (
+                              <Image
+                                src={card.iconUrls.medium}
+                                alt={card.name}
+                                width={20}
+                                height={20}
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                                ?
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Troféus */}
+                      <div className="flex flex-col items-center sm:ml-2">
+                        <div className="text-xs text-gray-400 mb-1 hidden sm:block">Troféus</div>
+                        <div className={`text-sm sm:text-base lg:text-lg font-bold px-2 sm:px-2 py-1 rounded ${
                           battle.trophyChange > 0 ? 'bg-emerald-600 text-white' :
                           battle.trophyChange < 0 ? 'bg-rose-600 text-white' :
                           'bg-gray-600 text-white'
                         }`}>
                           {battle.trophyChange > 0 ? '+' : ''}{battle.trophyChange}
                         </div>
+                        <div className="text-xs text-gray-400 sm:hidden">troféus</div>
                       </div>
+                    </div>
+                  </div>
+                  
+                  {/* Mobile: Decks em linha separada */}
+                  <div className="sm:hidden lg:hidden flex justify-between mt-3 pt-3 border-t border-white/10">
+                    <div className="flex gap-1">
+                      <span className="text-xs text-white/50 mr-1">Meu:</span>
+                      {(battle.teamCards || []).slice(0, 4).map((card: any, cardIndex: number) => (
+                        <div 
+                          key={cardIndex}
+                          className="w-5 h-5 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
+                          title={card.name}
+                        >
+                          {card.iconUrls?.medium ? (
+                            <Image
+                              src={card.iconUrls.medium}
+                              alt={card.name}
+                              width={20}
+                              height={20}
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                              ?
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex gap-1">
+                      <span className="text-xs text-white/50 mr-1">Vs:</span>
+                      {(battle.opponentCards || []).slice(0, 4).map((card: any, cardIndex: number) => (
+                        <div 
+                          key={cardIndex}
+                          className="w-5 h-5 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
+                          title={card.name}
+                        >
+                          {card.iconUrls?.medium ? (
+                            <Image
+                              src={card.iconUrls.medium}
+                              alt={card.name}
+                              width={20}
+                              height={20}
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                              ?
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>

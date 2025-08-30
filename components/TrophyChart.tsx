@@ -118,25 +118,26 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
   ];
 
   return (
-    <div className="glass-dark float p-8">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-br from-gold/80 to-yellow-500/80 rounded-2xl flex items-center justify-center">
-          <span className="text-white font-bold text-lg">📊</span>
+    <div className="glass-dark float p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
+        <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-br from-gold/80 to-yellow-500/80 rounded-xl sm:rounded-2xl flex items-center justify-center">
+          <span className="text-white font-bold text-base sm:text-lg">📊</span>
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Progresso de Troféus</h2>
-          <p className="text-white/70">Evolução no período selecionado</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Progresso de Troféus</h2>
+          <p className="text-sm sm:text-base text-white/70">Evolução no período selecionado</p>
         </div>
       </div>
       
       {/* Period Selector */}
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        <span className="text-sm text-white/70 mr-2">Período:</span>
+      <div className="mb-4 sm:mb-6">
+        <div className="text-xs sm:text-sm text-white/70 mb-2 sm:mb-3">Período:</div>
+        <div className="flex flex-wrap items-center gap-2">
         {periods.map((period) => (
           <button
             key={period.value}
             onClick={() => setSelectedPeriod(period.value)}
-            className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
+            className={`px-3 sm:px-3 py-2 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
               selectedPeriod === period.value
                 ? 'bg-cyan-500 text-white shadow-lg'
                 : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
@@ -145,33 +146,34 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
             {period.label}
           </button>
         ))}
+        </div>
       </div>
       
-      <div className="h-48 sm:h-64 glass rounded-2xl p-2 sm:p-4">
+      <div className="h-56 sm:h-64 glass rounded-xl sm:rounded-2xl p-3 sm:p-4">
         <ReLineChart data={getFilteredData()} />
       </div>
       
       {/* Chart Stats */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
         <div className="text-center">
-          <div className="text-base sm:text-lg font-bold text-cyan-400">{getFilteredData().length}</div>
+          <div className="text-sm sm:text-lg font-bold text-cyan-400">{getFilteredData().length}</div>
           <div className="text-xs text-white/60">Pontos no gráfico</div>
         </div>
         <div className="text-center">
-          <div className="text-base sm:text-lg font-bold text-emerald-400">
+          <div className="text-sm sm:text-lg font-bold text-emerald-400">
             {getFilteredData().length > 1 
               ? getFilteredData()[getFilteredData().length - 1]?.trophies - getFilteredData()[0]?.trophies 
               : 0}
           </div>
-          <div className="text-xs text-white/60">Variação no período</div>
+          <div className="text-xs text-white/60">Variação</div>
         </div>
         <div className="text-center">
-          <div className="text-base sm:text-lg font-bold text-gold">
+          <div className="text-sm sm:text-lg font-bold text-gold">
             {getFilteredData().length > 0 
               ? Math.max(...getFilteredData().map(d => d.trophies))
               : 0}
           </div>
-          <div className="text-xs text-white/60">Pico no período</div>
+          <div className="text-xs text-white/60">Pico</div>
         </div>
       </div>
     </div>
