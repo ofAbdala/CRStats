@@ -11,7 +11,7 @@ function groupBattlesBySessions(battles: any[]) {
   
   const sessions = [];
   let currentSession = [];
-  const SESSION_GAP_HOURS = 2; // 2 horas de gap = nova sessão
+  const SESSION_GAP_MINUTES = 30; // 30 minutos de gap = nova sessão
   
   for (let i = 0; i < battles.length; i++) {
     const battle = battles[i];
@@ -30,9 +30,9 @@ function groupBattlesBySessions(battles: any[]) {
         continue;
       }
       
-      const timeDiff = (lastBattleTime.getTime() - battleTime.getTime()) / (1000 * 60 * 60);
+      const timeDiff = (lastBattleTime.getTime() - battleTime.getTime()) / (1000 * 60); // em minutos
       
-      if (timeDiff > SESSION_GAP_HOURS) {
+      if (timeDiff > SESSION_GAP_MINUTES) {
         // Nova sessão
         sessions.push([...currentSession]);
         currentSession = [battle];
