@@ -77,9 +77,9 @@
 
 /* 3-Crown Win Special Effects */
 :root {
-  --win-1: #3772ff;   /* azul */
-  --win-2: #8b5cf6;   /* roxo */
-  --win-3: #ef4444;   /* vermelho */
+  --win-1: #ffd700;   /* dourado */
+  --win-2: #ffb347;   /* laranja dourado */
+  --win-3: #ff8c00;   /* laranja */
   --card-bg: #16181c;
   --text: #e5e7eb;
   --muted: #a1a1aa;
@@ -111,7 +111,7 @@
   background: linear-gradient(100deg,var(--win-1),var(--win-2) 55%,var(--win-3));
   opacity: .35;
   background-size: 200% 200%;
-  animation: gradientShift 14s ease-in-out infinite alternate;
+  animation: gradientShift 4s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
@@ -127,12 +127,12 @@
   right: 36%; top: -40%;
   background: radial-gradient(
     circle at 70% 55%,
-    rgba(156,163,255,.55) 0%,
-    rgba(156,163,255,.28) 20%,
-    rgba(156,163,255,0) 60%
+    rgba(255,215,0,.65) 0%,
+    rgba(255,215,0,.35) 20%,
+    rgba(255,215,0,0) 60%
   );
   filter: blur(60px);
-  animation: pulse 6s ease-in-out infinite alternate;
+  animation: pulse 2s ease-in-out infinite alternate;
   pointer-events: none;
 }
 @keyframes pulse {
