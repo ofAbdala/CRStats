@@ -14,6 +14,11 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
     Math.round((battles.filter(b => b.result === 'WIN').length / battles.length) * 100) : 
     (player.wins && player.losses ? Math.round((player.wins / (player.wins + player.losses)) * 100) : 60);
 
+  // Calcula média de troféus por partida baseada nas batalhas recentes
+  const avgTrophiesPerMatch = battles.length > 0 ? 
+    battles.reduce((sum, battle) => sum + (battle.trophyChange || 0), 0) / battles.length : 
+    0;
+
   const { current: currentArena, next: nextArena, progress } = getArenaProgress(player.trophies);
   const arenaEmoji = getArenaEmoji(currentArena);
 
