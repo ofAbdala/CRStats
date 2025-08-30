@@ -17,6 +17,28 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
   const { current: currentArena, next: nextArena, progress } = getArenaProgress(player.trophies);
   const arenaEmoji = getArenaEmoji(currentArena);
 
+  // Calcula estimativas para próxima arena
+  const trophiesNeeded = nextArena ? nextArena.minTrophies - player.trophies : 0;
+  const estimatedMatches = avgTrophiesPerMatch > 0 ? Math.ceil(trophiesNeeded / avgTrophiesPerMatch) : 0;
+  
+  // Calcula tempo estimado baseado na frequência de batalhas
+  const averageTimeBetweenBattles = battles.length > 1 ? 
+    (Date.now() - new Date(battles[battles.length - 1].time).getTime()) / (battles.length - 1) : 
+    1800000; // 30 min default
+  
+  const estimatedTimeHours = (estimatedMatches * averageTimeBetweenBattles) / (1000 * 60 * 60);
+  
+  // Função para formatar tempo estimado
+  const formatEstimatedTime = (hours: number) => {
+    if (hours < 1) {
+      return `${Math.round(hours * 60)}min`;
+    } else if (hours < 24) {
+      return `${Math.round(hours)}h`;
+    } else {
+      return `${Math.round(hours / 24)}d`;
+    }
+  };
+
   return (
     <div className="glass-dark float p-4 sm:p-6 lg:p-8">
       {/* Header com Solo */}
