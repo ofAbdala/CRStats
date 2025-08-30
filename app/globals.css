@@ -90,7 +90,6 @@
 /* CARD LENDÁRIA - 3 COROAS */
 .match-card {
   position: relative;
-  border-radius: 14px;
   display: flex;
   gap: 16px;
   color: var(--text);
