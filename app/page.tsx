@@ -207,7 +207,7 @@ export default function Page() {
           {/* Header Navigation */}
           <header className="fixed top-0 inset-x-0 z-50">
             <nav className="mx-auto max-w-7xl px-4 md:px-6">
-              <div className="mt-4 nav-glass float flex items-center justify-between px-6 py-3">
+              <div className="mt-4 nav-glass float flex items-center justify-between px-4 sm:px-6 py-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-xl flex items-center justify-center">
                     <Crown className="w-5 h-5 text-white" />
@@ -215,40 +215,40 @@ export default function Page() {
                   <span className="text-lg font-bold tracking-wide text-white/95">ClashDex</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-white/70">Clash Royale Stats</span>
+                  <span className="text-sm text-white/70 hidden sm:block">Clash Royale Stats</span>
                 </div>
               </div>
             </nav>
           </header>
 
           {/* Hero Section */}
-          <section className="relative pt-[8rem] md:pt-[10rem] pb-16 px-6">
+          <section className="relative pt-[6rem] sm:pt-[8rem] md:pt-[10rem] pb-8 sm:pb-16 px-4 sm:px-6">
             <div className="mx-auto max-w-7xl">
               <div className="max-w-4xl mx-auto text-center">
-                <div className="mb-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-3xl flex items-center justify-center mx-auto mb-8 float floaty">
-                    <Crown className="w-12 h-12 text-white" />
+                <div className="mb-6 sm:mb-8">
+                  <div className="w-20 sm:w-24 h-20 sm:h-24 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-6 sm:mb-8 float floaty">
+                    <Crown className="w-10 sm:w-12 h-10 sm:h-12 text-white" />
                   </div>
-                  <h1 className="text-gradient text-6xl md:text-8xl font-extrabold leading-[1.05] mb-6">
+                  <h1 className="text-gradient text-4xl sm:text-6xl md:text-8xl font-extrabold leading-[1.05] mb-4 sm:mb-6">
                     Clash<span className="text-cyan-400">Dex</span>
                   </h1>
-                  <p className="text-xl md:text-2xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
+                  <p className="text-lg sm:text-xl md:text-2xl text-white/70 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-4">
                     Analise suas estatísticas do Clash Royale com progresso em tempo real. by X1.Payments
                   </p>
                 </div>
 
                 {/* Search Form */}
-                <div className="max-w-lg mx-auto mb-8 sm:mb-12">
+                <div className="max-w-lg mx-auto mb-6 sm:mb-8">
                   <form onSubmit={onSearch}>
                     <div className="glass float p-2">
                       <div className="relative">
-                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 w-5 h-5" />
+                        <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-white/50 w-4 sm:w-5 h-4 sm:h-5" />
                         <input 
                           name="tag" 
                           value={tag}
                           onChange={(e) => setTag(e.target.value)}
                           placeholder="Digite sua TAG (#XXXXXXX)"
-                          className="w-full pl-12 pr-4 py-3 sm:py-4 bg-transparent text-white placeholder:text-white/50 focus:outline-none text-center text-base sm:text-lg"
+                          className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 bg-transparent text-white placeholder:text-white/50 focus:outline-none text-center text-sm sm:text-base md:text-lg"
                         />
                       </div>
                     </div>
@@ -276,18 +276,18 @@ export default function Page() {
                 </div>
 
                 {loading && (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="glass float px-6 py-4">
+                  <div className="flex items-center justify-center py-6 sm:py-8">
+                    <div className="glass float px-4 sm:px-6 py-3 sm:py-4">
                       <div className="flex items-center gap-3 text-white/70">
-                        <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span>Carregando dados do jogador...</span>
+                        <div className="w-4 sm:w-5 h-4 sm:h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm sm:text-base">Carregando dados do jogador...</span>
                       </div>
                     </div>
                   </div>
                 )}
                 
                 {err && (
-                  <div className="glass float p-6 text-rose-400 max-w-md mx-auto mt-6 border-rose-500/20">
+                  <div className="glass float p-4 sm:p-6 text-rose-400 max-w-md mx-auto mt-6 border-rose-500/20">
                     <div className="font-medium">Erro ao carregar dados</div>
                     <div className="text-sm text-rose-300 mt-1">{err}</div>
                   </div>
@@ -297,25 +297,25 @@ export default function Page() {
           </section>
 
           {/* Features Section */}
-          <section className="relative py-20 px-6">
+          <section className="relative py-12 sm:py-20 px-4 sm:px-6">
             <div className="mx-auto max-w-7xl">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Recursos Principais</h2>
-                <p className="text-xl text-white/70 max-w-3xl mx-auto">
+              <div className="text-center mb-8 sm:mb-16">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6">Recursos Principais</h2>
+                <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto px-4">
                   Descubra tudo o que o ClashDex oferece para melhorar sua experiência no Clash Royale
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {features.map((feature, index) => (
-                  <div key={index} className="glass-dark float hover-lift p-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-400/20 to-fuchsia-500/20 rounded-2xl flex items-center justify-center mb-6 floaty">
+                  <div key={index} className="glass-dark float hover-lift p-6 sm:p-8">
+                    <div className="w-12 sm:w-16 h-12 sm:h-16 bg-gradient-to-br from-cyan-400/20 to-fuchsia-500/20 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 floaty">
                       <div className="text-cyan-400">
                         {feature.icon}
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                    <p className="text-white/70">{feature.description}</p>
+                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">{feature.title}</h3>
+                    <p className="text-white/70 text-sm sm:text-base">{feature.description}</p>
                   </div>
                 ))}
               </div>
@@ -324,14 +324,14 @@ export default function Page() {
 
           {/* Popular Players Section */}
           {popularPlayers.length > 0 && (
-            <section className="relative py-20 px-6">
+            <section className="relative py-12 sm:py-20 px-4 sm:px-6">
               <div className="mx-auto max-w-7xl">
-                <div className="text-center mb-16">
-                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Jogadores Recentes</h2>
-                  <p className="text-xl text-white/70">Oponentes encontrados nas últimas batalhas</p>
+                <div className="text-center mb-8 sm:mb-16">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6">Jogadores Recentes</h2>
+                  <p className="text-lg sm:text-xl text-white/70">Oponentes encontrados nas últimas batalhas</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {popularPlayers.map((player, index) => (
                     <button
                       key={index}
@@ -339,18 +339,18 @@ export default function Page() {
                         setTag(player.tag);
                         load(player.tag);
                       }}
-                      className="glass-dark float hover-lift p-6 text-left"
+                      className="glass-dark float hover-lift p-4 sm:p-6 text-left"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-gold/80 to-yellow-400/80 rounded-2xl flex items-center justify-center">
-                          <span className="text-2xl">👤</span>
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 sm:w-14 h-12 sm:h-14 bg-gradient-to-br from-gold/80 to-yellow-400/80 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <span className="text-xl sm:text-2xl">👤</span>
                         </div>
                         <div>
-                          <div className="text-lg font-semibold text-white">
+                          <div className="text-base sm:text-lg font-semibold text-white">
                             {player.name}
                           </div>
-                          <div className="text-white/60">#{player.tag}</div>
-                          <div className="text-sm text-gold">{player.trophies !== "N/A" ? `${player.trophies} troféus` : "Troféus não disponíveis"}</div>
+                          <div className="text-white/60 text-sm">#{player.tag}</div>
+                          <div className="text-xs sm:text-sm text-gold">{player.trophies !== "N/A" ? `${player.trophies} troféus` : "Troféus não disponíveis"}</div>
                         </div>
                       </div>
                     </button>
@@ -361,33 +361,33 @@ export default function Page() {
           )}
 
           {/* Stats Preview */}
-          <section className="relative py-20 px-6">
+          <section className="relative py-12 sm:py-20 px-4 sm:px-6">
             <div className="mx-auto max-w-7xl">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Estatísticas Detalhadas</h2>
-                <p className="text-xl text-white/70">Veja um preview do que você encontrará ao buscar um jogador</p>
+              <div className="text-center mb-8 sm:mb-16">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6">Estatísticas Detalhadas</h2>
+                <p className="text-lg sm:text-xl text-white/70 px-4">Veja um preview do que você encontrará ao buscar um jogador</p>
               </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-                <div className="glass-dark float p-8 text-center floaty">
-                  <TrendingUp className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-emerald-400 mb-2">65%</div>
-                  <div className="text-white/70">Win Rate</div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 max-w-5xl mx-auto">
+                <div className="glass-dark float p-4 sm:p-8 text-center floaty">
+                  <TrendingUp className="w-6 sm:w-10 h-6 sm:h-10 text-emerald-400 mx-auto mb-2 sm:mb-4" />
+                  <div className="text-xl sm:text-3xl font-bold text-emerald-400 mb-1 sm:mb-2">65%</div>
+                  <div className="text-white/70 text-xs sm:text-base">Win Rate</div>
                 </div>
-                <div className="glass-dark float p-8 text-center floaty" style={{ animationDelay: '1s' }}>
-                  <Crown className="w-10 h-10 text-gold mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-gold mb-2">1,247</div>
-                  <div className="text-white/70">3 Coroas</div>
+                <div className="glass-dark float p-4 sm:p-8 text-center floaty" style={{ animationDelay: '1s' }}>
+                  <Crown className="w-6 sm:w-10 h-6 sm:h-10 text-gold mx-auto mb-2 sm:mb-4" />
+                  <div className="text-xl sm:text-3xl font-bold text-gold mb-1 sm:mb-2">1,247</div>
+                  <div className="text-white/70 text-xs sm:text-base">3 Coroas</div>
                 </div>
-                <div className="glass-dark float p-8 text-center floaty" style={{ animationDelay: '2s' }}>
-                  <Trophy className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-fuchsia-400 mb-2">6,543</div>
-                  <div className="text-white/70">Melhor Temporada</div>
+                <div className="glass-dark float p-4 sm:p-8 text-center floaty" style={{ animationDelay: '2s' }}>
+                  <Trophy className="w-6 sm:w-10 h-6 sm:h-10 text-fuchsia-400 mx-auto mb-2 sm:mb-4" />
+                  <div className="text-xl sm:text-3xl font-bold text-fuchsia-400 mb-1 sm:mb-2">6,543</div>
+                  <div className="text-white/70 text-xs sm:text-base">Melhor Temporada</div>
                 </div>
-                <div className="glass-dark float p-8 text-center floaty" style={{ animationDelay: '3s' }}>
-                  <Zap className="w-10 h-10 text-cyan-400 mx-auto mb-4" />
-                  <div className="text-3xl font-bold text-cyan-400 mb-2">+127</div>
-                  <div className="text-white/70">Push Atual</div>
+                <div className="glass-dark float p-4 sm:p-8 text-center floaty" style={{ animationDelay: '3s' }}>
+                  <Zap className="w-6 sm:w-10 h-6 sm:h-10 text-cyan-400 mx-auto mb-2 sm:mb-4" />
+                  <div className="text-xl sm:text-3xl font-bold text-cyan-400 mb-1 sm:mb-2">+127</div>
+                  <div className="text-white/70 text-xs sm:text-base">Push Atual</div>
                 </div>
               </div>
             </div>
@@ -399,50 +399,50 @@ export default function Page() {
           {/* Header Navigation */}
           <header className="fixed top-0 inset-x-0 z-50">
             <nav className="mx-auto max-w-7xl px-4 md:px-6">
-              <div className="mt-4 nav-glass float flex items-center justify-between px-6 py-3">
+              <div className="mt-4 nav-glass float flex items-center justify-between px-4 sm:px-6 py-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-xl flex items-center justify-center">
                     <Crown className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-lg font-bold tracking-wide text-white/95">ClashDex</span>
+                  <span className="text-lg font-bold tracking-wide text-white/95">ClashDx</span>
                 </div>
                 <button 
                   onClick={() => setShowPlayerData(false)}
-                  className="btn-ios"
+                  className="btn-ios text-sm"
                 >
-                  ← Voltar ao Início
+                  ← Voltar
                 </button>
               </div>
             </nav>
           </header>
 
-          <div className="pt-[7rem] px-6">
+          <div className="pt-[5rem] sm:pt-[7rem] px-4 sm:px-6">
             <div className="max-w-7xl mx-auto">
               {/* Player Header */}
               {player && (
-                <div className="glass-dark float p-4 sm:p-8 mb-8">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-6">
+                <div className="glass-dark float p-4 sm:p-8 mb-6 sm:mb-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-4 sm:mb-6">
                     <div className="flex items-center gap-3 sm:gap-6">
                       <div className="w-16 sm:w-24 h-16 sm:h-24 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-cyan-400 to-fuchsia-500 flex items-center justify-center text-2xl sm:text-4xl border-2 border-white/10 float">
                         👑
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mb-2 sm:mb-3">
-                          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white">{player.name}</h1>
+                          <h1 className="text-xl sm:text-4xl md:text-5xl font-bold text-white truncate">{player.name}</h1>
                           <div className="flex items-center gap-2">
-                            <span className="text-base sm:text-xl text-white/60 font-mono">#{player.tag}</span>
-                            <Star className="w-4 sm:w-6 h-4 sm:h-6 text-gold" />
+                            <span className="text-sm sm:text-xl text-white/60 font-mono">#{player.tag}</span>
+                            <Star className="w-3 sm:w-6 h-3 sm:h-6 text-gold" />
                           </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm sm:text-lg">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-xs sm:text-lg">
                           <div className="flex items-center gap-2">
                             <div className="w-2 sm:w-3 h-2 sm:h-3 bg-cyan-400 rounded-full"></div>
-                            <span className="text-white/80">{getArenaByTrophies(player.trophies).name}</span>
+                            <span className="text-white/80 truncate">{getArenaByTrophies(player.trophies).name}</span>
                           </div>
                           {player.clan && (
                             <div className="flex items-center gap-2">
                               <div className="w-2 sm:w-3 h-2 sm:h-3 bg-fuchsia-400 rounded-full"></div>
-                              <span className="text-white/80">{player.clan}</span>
+                              <span className="text-white/80 truncate">{player.clan}</span>
                             </div>
                           )}
                         </div>
@@ -451,15 +451,15 @@ export default function Page() {
                     
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                       <div className="text-center sm:text-right flex-shrink-0">
-                        <div className="text-3xl sm:text-4xl md:text-6xl font-bold text-gradient mb-1 sm:mb-2">{player.trophies.toLocaleString()}</div>
-                        <div className="text-white/70 text-sm sm:text-base lg:text-lg">Troféus Atuais</div>
+                        <div className="text-2xl sm:text-4xl md:text-6xl font-bold text-gradient mb-1 sm:mb-2">{player.trophies.toLocaleString()}</div>
+                        <div className="text-white/70 text-xs sm:text-base lg:text-lg">Troféus Atuais</div>
                         <div className="text-white/50 text-xs sm:text-sm mt-1 sm:mt-2">Melhor: {player.bestTrophies.toLocaleString()}</div>
                       </div>
                       
                       <button
                         onClick={refreshData}
                         disabled={isRefreshing}
-                        className="btn-ios flex items-center justify-center gap-2 w-full sm:w-auto"
+                        className="btn-ios flex items-center justify-center gap-2 w-full sm:w-auto text-sm"
                       >
                         <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                         {isRefreshing ? 'Atualizando...' : 'Atualizar'}
@@ -469,7 +469,7 @@ export default function Page() {
                   
                   {lastUpdated && (
                     <div className="text-xs sm:text-sm text-white/50 flex items-center justify-center sm:justify-start gap-2">
-                      <Clock className="w-4 h-4" />
+                      <Clock className="w-3 sm:w-4 h-3 sm:h-4" />
                       <span>
                         Atualização: {lastUpdated.toLocaleString('pt-BR', {
                           timeZone: 'America/Sao_Paulo',
@@ -486,25 +486,25 @@ export default function Page() {
               )}
 
               {/* Tabs Navigation */}
-              <div className="glass float mb-8">
-                <div className="flex overflow-x-auto">
+              <div className="glass float mb-6 sm:mb-8">
+                <div className="flex overflow-x-auto scrollbar-hide">
                   {[
-                    { id: 'resumo', label: 'Resumo', icon: <BarChart3 className="w-5 h-5" /> },
-                    { id: 'historico', label: 'Histórico', icon: <Calendar className="w-5 h-5" /> },
-                    { id: 'estatisticas', label: 'Estatísticas', icon: <Trophy className="w-5 h-5" /> },
-                    { id: 'live', label: 'Ao Vivo', icon: <Zap className="w-5 h-5" /> }
+                    { id: 'resumo', label: 'Resumo', icon: <BarChart3 className="w-4 sm:w-5 h-4 sm:h-5" /> },
+                    { id: 'historico', label: 'Histórico', icon: <Calendar className="w-4 sm:w-5 h-4 sm:h-5" /> },
+                    { id: 'estatisticas', label: 'Estatísticas', icon: <Trophy className="w-4 sm:w-5 h-4 sm:h-5" /> },
+                    { id: 'live', label: 'Ao Vivo', icon: <Zap className="w-4 sm:w-5 h-4 sm:h-5" /> }
                   ].map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 sm:gap-3 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-medium transition-all duration-200 rounded-2xl whitespace-nowrap ${
+                      className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-6 lg:px-8 py-3 sm:py-4 font-medium transition-all duration-200 rounded-xl sm:rounded-2xl whitespace-nowrap ${
                         activeTab === tab.id
-                          ? 'bg-white/10 text-white'
+                          ? 'bg-white/10 text-white shadow-lg'
                           : 'text-white/60 hover:text-white hover:bg-white/5'
                       }`}
                     >
                       {tab.icon}
-                      <span className="text-sm sm:text-base">{tab.label}</span>
+                      <span className="text-xs sm:text-base">{tab.label}</span>
                     </button>
                   ))}
                 </div>
@@ -512,7 +512,7 @@ export default function Page() {
 
               {/* Tab Content */}
               {activeTab === 'resumo' && player && summary && (
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   <LeagueInfo player={player} battles={battles} />
                   <TrophyChart series={summary.series} battles={battles} player={player} />
                   <SessionHistory battles={battles} />
@@ -520,13 +520,13 @@ export default function Page() {
               )}
 
               {activeTab === 'historico' && (
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   <BattleHistory battles={battles} />
                 </div>
               )}
 
               {activeTab === 'estatisticas' && player && summary && (
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   {/* Gráfico de Avanço dos Troféus */}
                   <TrophyChart series={summary.series} battles={battles} player={player} />
                   
@@ -535,23 +535,23 @@ export default function Page() {
                     <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
                       <TrendingUp className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-emerald-400 mx-auto mb-2 sm:mb-4" />
                       <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-400 mb-1 sm:mb-2">{summary.winRate}%</div>
-                      <div className="text-white/70">Win Rate</div>
+                      <div className="text-white/70 text-xs sm:text-base">Win Rate</div>
                       <div className="text-xs sm:text-sm text-white/50 mt-1 sm:mt-2">{summary.wins}W / {summary.losses}L</div>
                     </div>
                     <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
                       <Crown className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-gold mx-auto mb-2 sm:mb-4" />
                       <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gold mb-1 sm:mb-2">{player.threeCrownWins?.toLocaleString() || '0'}</div>
-                      <div className="text-white/70">3 Coroas</div>
+                      <div className="text-white/70 text-xs sm:text-base">3 Coroas</div>
                     </div>
                     <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
                       <Trophy className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-fuchsia-400 mx-auto mb-2 sm:mb-4" />
                       <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-fuchsia-400 mb-1 sm:mb-2">{player.bestTrophies?.toLocaleString() || '0'}</div>
-                      <div className="text-white/70">Melhor Temporada</div>
+                      <div className="text-white/70 text-xs sm:text-base">Melhor Temporada</div>
                     </div>
                     <div className="glass-dark float p-4 sm:p-6 lg:p-8 text-center">
                       <Zap className="w-6 sm:w-8 lg:w-10 h-6 sm:h-8 lg:h-10 text-cyan-400 mx-auto mb-2 sm:mb-4" />
                       <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-400 mb-1 sm:mb-2">{(summary.trophyDelta > 0 ? '+' : '') + summary.trophyDelta}</div>
-                      <div className="text-white/70">Push Atual</div>
+                      <div className="text-white/70 text-xs sm:text-base">Push Atual</div>
                       <div className="text-xs sm:text-sm text-white/50 mt-1 sm:mt-2">{summary.matchesTotal} partidas</div>
                     </div>
                   </div>
@@ -559,27 +559,27 @@ export default function Page() {
               )}
 
               {activeTab === 'live' && (
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   {/* Status de Atividade */}
-                  <div className="glass-dark float p-6 sm:p-8">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                  <div className="glass-dark float p-4 sm:p-6 lg:p-8">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                      <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center ${
                         liveData?.isActive ? 'bg-emerald-500' : 'bg-gray-600'
                       }`}>
-                        <Zap className="w-7 h-7 text-white" />
+                        <Zap className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold text-white">Status Ao Vivo</h2>
-                        <p className={`text-sm ${liveData?.isActive ? 'text-emerald-400' : 'text-gray-400'}`}>
+                        <h2 className="text-lg sm:text-2xl font-bold text-white">Status Ao Vivo</h2>
+                        <p className={`text-xs sm:text-sm ${liveData?.isActive ? 'text-emerald-400' : 'text-gray-400'}`}>
                           {liveData?.isActive ? '🟢 Jogador Ativo' : '🔴 Jogador Offline'}
                         </p>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="glass p-4 text-center">
-                        <div className="text-sm text-white/70 mb-2">Última Batalha</div>
-                        <div className="text-lg font-bold text-cyan-400">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                      <div className="glass p-3 sm:p-4 text-center">
+                        <div className="text-xs sm:text-sm text-white/70 mb-1 sm:mb-2">Última Batalha</div>
+                        <div className="text-sm sm:text-lg font-bold text-cyan-400">
                           {liveData?.minutesSinceLastBattle || 0} min atrás
                         </div>
                         <div className="text-xs text-white/50 mt-1">
@@ -587,9 +587,9 @@ export default function Page() {
                         </div>
                       </div>
                       
-                      <div className="glass p-4 text-center">
-                        <div className="text-sm text-white/70 mb-2">Status</div>
-                        <div className={`text-lg font-bold ${liveData?.isActive ? 'text-emerald-400' : 'text-gray-400'}`}>
+                      <div className="glass p-3 sm:p-4 text-center">
+                        <div className="text-xs sm:text-sm text-white/70 mb-1 sm:mb-2">Status</div>
+                        <div className={`text-sm sm:text-lg font-bold ${liveData?.isActive ? 'text-emerald-400' : 'text-gray-400'}`}>
                           {liveData?.isActive ? 'Online' : 'Offline'}
                         </div>
                         <div className="text-xs text-white/50 mt-1">
@@ -597,9 +597,9 @@ export default function Page() {
                         </div>
                       </div>
                       
-                      <div className="glass p-4 text-center">
-                        <div className="text-sm text-white/70 mb-2">Próxima Verificação</div>
-                        <div className="text-lg font-bold text-blue-400">
+                      <div className="glass p-3 sm:p-4 text-center">
+                        <div className="text-xs sm:text-sm text-white/70 mb-1 sm:mb-2">Próxima Verificação</div>
+                        <div className="text-sm sm:text-lg font-bold text-blue-400">
                           {isRefreshing ? 'Agora' : '1 min'}
                         </div>
                         <div className="text-xs text-white/50 mt-1">
@@ -611,27 +611,27 @@ export default function Page() {
 
                   {/* Sessão Atual */}
                   {liveData?.currentSession && (
-                    <div className="glass-dark float p-6 sm:p-8">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-gradient-to-br from-fuchsia-500 to-purple rounded-2xl flex items-center justify-center">
-                          <BarChart3 className="w-7 h-7 text-white" />
+                    <div className="glass-dark float p-4 sm:p-6 lg:p-8">
+                      <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-br from-fuchsia-500 to-purple rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <BarChart3 className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold text-white">Sessão Atual</h2>
-                          <p className="text-white/70">Estatísticas da sessão ativa</p>
+                          <h2 className="text-lg sm:text-2xl font-bold text-white">Sessão Atual</h2>
+                          <p className="text-xs sm:text-base text-white/70">Estatísticas da sessão ativa</p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="glass p-4 text-center">
-                          <div className="text-sm text-white/70 mb-2">Partidas</div>
-                          <div className="text-2xl font-bold text-white">{liveData.currentSession.battles}</div>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div className="glass p-3 sm:p-4 text-center">
+                          <div className="text-xs sm:text-sm text-white/70 mb-1 sm:mb-2">Partidas</div>
+                          <div className="text-lg sm:text-2xl font-bold text-white">{liveData.currentSession.battles}</div>
                           <div className="text-xs text-white/50">total</div>
                         </div>
                         
-                        <div className="glass p-4 text-center">
-                          <div className="text-sm text-white/70 mb-2">Win Rate</div>
-                          <div className={`text-2xl font-bold ${
+                        <div className="glass p-3 sm:p-4 text-center">
+                          <div className="text-xs sm:text-sm text-white/70 mb-1 sm:mb-2">Win Rate</div>
+                          <div className={`text-lg sm:text-2xl font-bold ${
                             liveData.currentSession.winRate >= 60 ? 'text-emerald-400' : 
                             liveData.currentSession.winRate >= 50 ? 'text-gold' : 'text-rose-400'
                           }`}>
@@ -642,9 +642,9 @@ export default function Page() {
                           </div>
                         </div>
                         
-                        <div className="glass p-4 text-center">
-                          <div className="text-sm text-white/70 mb-2">Troféus</div>
-                          <div className={`text-2xl font-bold ${
+                        <div className="glass p-3 sm:p-4 text-center">
+                          <div className="text-xs sm:text-sm text-white/70 mb-1 sm:mb-2">Troféus</div>
+                          <div className={`text-lg sm:text-2xl font-bold ${
                             liveData.currentSession.trophyChange > 0 ? 'text-emerald-400' : 
                             liveData.currentSession.trophyChange < 0 ? 'text-rose-400' : 'text-gray-400'
                           }`}>
@@ -653,9 +653,9 @@ export default function Page() {
                           <div className="text-xs text-white/50">na sessão</div>
                         </div>
                         
-                        <div className="glass p-4 text-center">
-                          <div className="text-sm text-white/70 mb-2">Ritmo</div>
-                          <div className="text-2xl font-bold text-blue-400">
+                        <div className="glass p-3 sm:p-4 text-center">
+                          <div className="text-xs sm:text-sm text-white/70 mb-1 sm:mb-2">Ritmo</div>
+                          <div className="text-lg sm:text-2xl font-bold text-blue-400">
                             {liveData.currentSession.battlesPerHour}
                           </div>
                           <div className="text-xs text-white/50">partidas/hora</div>
@@ -666,31 +666,31 @@ export default function Page() {
 
                   {/* Alertas de Atividade */}
                   {liveData?.isActive && (
-                    <div className="glass-dark float p-6 sm:p-8 border border-emerald-500/30">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center">
-                          <Trophy className="w-6 h-6 text-white" />
+                    <div className="glass-dark float p-4 sm:p-6 lg:p-8 border border-emerald-500/30">
+                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <div className="w-8 sm:w-10 h-8 sm:h-10 bg-emerald-500 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <Trophy className="w-4 sm:w-6 h-4 sm:h-6 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-emerald-400">🔥 Push Ativo Detectado!</h3>
-                          <p className="text-white/70">O jogador está em uma sessão de jogo ativa</p>
+                          <h3 className="text-base sm:text-xl font-bold text-emerald-400">🔥 Push Ativo Detectado!</h3>
+                          <p className="text-xs sm:text-base text-white/70">O jogador está em uma sessão de jogo ativa</p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="glass p-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="glass p-3 sm:p-4">
                           <div className="flex items-center justify-between">
-                            <span className="text-white/70">Última atividade:</span>
-                            <span className="text-emerald-400 font-bold">
+                            <span className="text-white/70 text-xs sm:text-base">Última atividade:</span>
+                            <span className="text-emerald-400 font-bold text-xs sm:text-base">
                               {liveData.minutesSinceLastBattle} minuto{liveData.minutesSinceLastBattle !== 1 ? 's' : ''} atrás
                             </span>
                           </div>
                         </div>
                         
-                        <div className="glass p-4">
+                        <div className="glass p-3 sm:p-4">
                           <div className="flex items-center justify-between">
-                            <span className="text-white/70">Push atual:</span>
-                            <span className={`font-bold ${
+                            <span className="text-white/70 text-xs sm:text-base">Push atual:</span>
+                            <span className={`font-bold text-xs sm:text-base ${
                               liveData.currentSession.trophyChange > 0 ? 'text-emerald-400' : 
                               liveData.currentSession.trophyChange < 0 ? 'text-rose-400' : 'text-gray-400'
                             }`}>
@@ -704,36 +704,36 @@ export default function Page() {
 
                   {/* Monitoramento */}
                   {liveData?.isActive && liveData?.currentSession && liveData.currentSession.battles > 0 && (
-                    <div className="glass-dark float p-6 sm:p-8">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-                          <RefreshCw className={`w-7 h-7 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <div className="glass-dark float p-4 sm:p-6 lg:p-8">
+                      <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                          <RefreshCw className={`w-5 sm:w-7 h-5 sm:h-7 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold text-white">Monitoramento</h2>
-                          <p className="text-white/70">Verificação automática de novas batalhas</p>
+                          <h2 className="text-lg sm:text-2xl font-bold text-white">Monitoramento</h2>
+                          <p className="text-xs sm:text-base text-white/70">Verificação automática de novas batalhas</p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="glass p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                            <span className="text-white font-medium">Auto-Refresh Ativo</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="glass p-3 sm:p-4">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <div className="w-2 sm:w-3 h-2 sm:h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                            <span className="text-white font-medium text-xs sm:text-base">Auto-Refresh Ativo</span>
                           </div>
-                          <div className="text-sm text-white/70 space-y-1">
+                          <div className="text-xs sm:text-sm text-white/70 space-y-1">
                             <p>• Verifica novas batalhas a cada 1 minuto</p>
                             <p>• Detecta atividade em tempo real</p>
                             <p>• Atualiza estatísticas automaticamente</p>
                           </div>
                         </div>
                         
-                        <div className="glass p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Clock className="w-5 h-5 text-blue-400" />
-                            <span className="text-white font-medium">Última Verificação</span>
+                        <div className="glass p-3 sm:p-4">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-blue-400" />
+                            <span className="text-white font-medium text-xs sm:text-base">Última Verificação</span>
                           </div>
-                          <div className="text-sm text-white/70">
+                          <div className="text-xs sm:text-sm text-white/70">
                             {lastUpdated ? lastUpdated.toLocaleString('pt-BR', {
                               timeZone: 'America/Sao_Paulo',
                               hour: '2-digit',
@@ -741,21 +741,21 @@ export default function Page() {
                               second: '2-digit'
                             }) : '--'}
                           </div>
-                          <div className="text-xs text-white/50 mt-2">
+                          <div className="text-xs text-white/50 mt-1 sm:mt-2">
                             {isRefreshing ? 'Verificando agora...' : 'Próxima em ~1 min'}
                           </div>
                         </div>
                       </div>
                       
-                      <div className="mt-6 pt-6 border-t border-white/10">
+                      <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
                         <button
                           onClick={refreshData}
                           disabled={isRefreshing}
-                          className="w-full glass-dark p-4 rounded-xl hover:bg-white/5 transition-all duration-200 disabled:opacity-50"
+                          className="w-full glass-dark p-3 sm:p-4 rounded-xl hover:bg-white/5 transition-all duration-200 disabled:opacity-50"
                         >
-                          <div className="flex items-center justify-center gap-3">
-                            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                            <span className="font-medium">
+                          <div className="flex items-center justify-center gap-2 sm:gap-3">
+                            <RefreshCw className={`w-4 sm:w-5 h-4 sm:h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                            <span className="font-medium text-xs sm:text-base">
                               {isRefreshing ? 'Verificando Novas Batalhas...' : 'Verificar Agora'}
                             </span>
                           </div>
@@ -771,13 +771,13 @@ export default function Page() {
       )}
 
       {/* Footer */}
-      <footer className="relative border-t hairline bg-black/20 backdrop-blur-md mt-20">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex items-center justify-between">
-            <div className="text-white/60">
+      <footer className="relative border-t hairline bg-black/20 backdrop-blur-md mt-12 sm:mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-white/60 text-center sm:text-left text-xs sm:text-base">
               Powered by <span className="text-cyan-400">Supercell API</span> • Inspired by Apple Design
             </div>
-            <div className="text-white/40 text-sm">
+            <div className="text-white/40 text-xs sm:text-sm">
               Next.js • Tailwind CSS • Recharts
             </div>
           </div>

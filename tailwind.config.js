@@ -7,7 +7,6 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // usa stack do sistema; não baixa nada da web
         sans: [
           'ui-sans-serif',
           'system-ui',

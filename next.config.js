@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  images: { 
-    domains: ['api-assets.clashroyale.com', 'cdn.royaleapi.com'] 
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'api-assets.clashroyale.com' },
+      { protocol: 'https', hostname: 'cdn.royaleapi.com' },
+    ],
   },
   experimental: {
     serverActions: { allowedOrigins: ['*'] }
@@ -15,4 +18,4 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+module.exports = nextConfig;

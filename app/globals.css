@@ -11,6 +11,15 @@
   font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', 'SF Pro Display', Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'; 
 }
 
+/* scrollbar hide for mobile tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* vidro fosco */
 .glass {
   @apply border border-white/15 rounded-3xl;
