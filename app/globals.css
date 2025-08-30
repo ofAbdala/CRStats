@@ -120,13 +120,13 @@
   border-radius: inherit;
   padding: 2px;
   background: conic-gradient(
-    from 0deg,
+    from var(--angle, 0deg),
     #7EF8FF, #7ACBFF, #B084FF, #FF9AE6, #FFE07A, #7AFFE0, #7EF8FF
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: legendaryRotate 2s linear infinite;
+  animation: legendaryColors 2s linear infinite;
   box-shadow: 
     0 0 14px rgba(126,248,255,.4), 
     0 0 28px rgba(176,132,255,.25),
@@ -135,8 +135,9 @@
   pointer-events: none;
 }
 
-@keyframes legendaryRotate { 
-  to { transform: rotate(360deg); } 
+@keyframes legendaryColors { 
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
 }
 
 /* SPOTLIGHT para carta lendária */
