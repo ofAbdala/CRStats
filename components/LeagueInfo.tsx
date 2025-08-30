@@ -1,6 +1,7 @@
 'use client';
 
 import { getArenaByTrophies, getNextArena, getArenaProgress, getArenaEmoji } from '@/lib/arenas';
+import { parseClashTime } from '@/lib/time';
 
 interface LeagueInfoProps {
   player: any;
@@ -8,23 +9,14 @@ interface LeagueInfoProps {
 }
 
 export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
-  const winRate = player.wins && player.losses ? 
-    Math.round((player.wins / (player.wins + player.losses)) * 100) : 0;
+  // Calcula win rate real das últimas batalhas (mais preciso que o total)
+  const recentWinRate = battles.length > 0 ? 
+    Math.round((battles.filter(b => b.result === 'WIN').length / battles.length) * 100) : 
+    (player.wins && player.losses ? Math.round((player.wins / (player.wins + player.losses)) * 100) : 60);
 
   const { current: currentArena, next: nextArena, progress } = getArenaProgress(player.trophies);
   const arenaEmoji = getArenaEmoji(currentArena);
 
-  // Calcula média de troféus por vitória baseado nas últimas batalhas
-  const recentWins = battles.filter(b => b.result === 'WIN' && b.trophyChange > 0);
-  const avgTrophiesPerWin = recentWins.length > 0 
-    ? Math.round(recentWins.reduce((sum, b) => sum + b.trophyChange, 0) / recentWins.length)
-    : 30; // Fallback padrão
-
-  // Calcula quantas partidas faltam (assumindo 60% win rate)
-  const trophiesNeeded = nextArena ? nextArena.minTrophies - player.trophies : 0;
-  const estimatedMatchesNeeded = trophiesNeeded > 0 
-    ? Math.ceil(trophiesNeeded / (avgTrophiesPerWin * 0.6)) // 60% win rate
-    : 0;
   return (
     <div className="glass-dark float p-4 sm:p-6 lg:p-8">
       {/* Header com Solo */}
