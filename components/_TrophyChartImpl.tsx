@@ -25,13 +25,23 @@ export default function Impl({ data }: { data: any[] }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 20, left: 10, right: 10, bottom: 20 }}>
-        <XAxis dataKey="label" hide />
+        <XAxis 
+          dataKey="label" 
+          stroke="#6B7280" 
+          fontSize={11}
+          tick={{ fill: '#9CA3AF' }}
+          tickLine={{ stroke: '#374151' }}
+          axisLine={{ stroke: '#374151' }}
+        />
         <YAxis 
           width={60} 
           stroke="#6B7280" 
           fontSize={12}
           domain={[minDomain, maxDomain]}
           tickFormatter={(value) => value.toLocaleString()}
+          tick={{ fill: '#9CA3AF' }}
+          tickLine={{ stroke: '#374151' }}
+          axisLine={{ stroke: '#374151' }}
         />
         <Tooltip 
           contentStyle={{ 

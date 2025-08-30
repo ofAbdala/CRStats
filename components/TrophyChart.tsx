@@ -82,13 +82,26 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
     // Adiciona pontos para cada batalha
     filteredBattles.forEach(battle => {
       trophies += (battle.trophyChange || 0);
-      newSeries.push({
-        label: formatDateTime(battle.battleTime, { 
+      
+      // Formato do label baseado no período
+      let label;
+      if (selectedPeriod === 'Today') {
+        // Para hoje, mostra apenas horário
+        label = formatDateTime(battle.battleTime, { 
+          dateStyle: undefined,
+          timeStyle: 'short'
+        });
+      } else {
+        // Para outros períodos, mostra dia/mês
+        label = formatDateTime(battle.battleTime, { 
           day: '2-digit',
           month: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        }),
+          timeStyle: undefined
+        });
+      }
+      
+      newSeries.push({
+        label: label,
         trophies: trophies
       });
     });
