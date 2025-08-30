@@ -87,9 +87,9 @@
 }
 
 /* CARD BASE */
+/* CARD LENDÁRIA - 3 COROAS */
 .match-card {
   position: relative;
-  overflow: hidden;
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
@@ -100,6 +100,7 @@
   transition: transform .18s ease, box-shadow .18s ease;
   z-index: 1;
 }
+
 .match-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 28px rgba(0,0,0,0.45);
@@ -111,42 +112,56 @@
   z-index: 2;
 }
 
-/* FUNDO COM DEGRADÊ ANIMADO */
+/* EFEITO CARTA LENDÁRIA - BORDA ROTATIVA */
 .match-card.win::before {
   content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(100deg,var(--win-1),var(--win-2) 55%,var(--win-3));
-  opacity: .12;
-  background-size: 200% 200%;
-  animation: gradientShift 2s ease-in-out infinite alternate;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes gradientShift {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-
-/* SPOTLIGHT no AI-Score */
-.match-card .spotlight {
   position: absolute;
-  width: 52%; height: 180%;
-  right: 36%; top: -40%;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from 0deg,
+    #7EF8FF, #7ACBFF, #B084FF, #FF9AE6, #FFE07A, #7AFFE0, #7EF8FF
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: legendaryRotate 2s linear infinite;
+  box-shadow: 
+    0 0 14px rgba(126,248,255,.4), 
+    0 0 28px rgba(176,132,255,.25),
+    0 0 40px rgba(255,231,122,.15);
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes legendaryRotate { 
+  to { transform: rotate(360deg); } 
+}
+
+/* SPOTLIGHT para carta lendária */
+.match-card.win .spotlight {
+  position: absolute;
+  width: 60%; 
+  height: 200%;
+  right: 30%; 
+  top: -50%;
   background: radial-gradient(
     circle at 70% 55%,
-    rgba(255,215,0,.65) 0%,
-    rgba(255,215,0,.08) 20%,
-    rgba(255,215,0,0) 60%
+    rgba(126,248,255,.3) 0%,
+    rgba(176,132,255,.15) 30%,
+    rgba(255,231,122,.1) 50%,
+    transparent 70%
   );
-  filter: blur(60px);
-  animation: pulse 1s ease-in-out infinite alternate;
+  filter: blur(40px);
+  animation: legendaryPulse 1.5s ease-in-out infinite alternate;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
-@keyframes pulse {
-  from { transform: scale(1); opacity: .5; }
-  to   { transform: scale(1.1); opacity: .8; }
+
+@keyframes legendaryPulse {
+  from { transform: scale(1); opacity: .4; }
+  to   { transform: scale(1.2); opacity: .7; }
 }
 
 /* AI-Score */
