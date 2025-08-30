@@ -1,8 +1,8 @@
 {
   "name": "clash-next",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
