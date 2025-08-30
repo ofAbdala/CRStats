@@ -1,25 +1,40 @@
-// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
       fontFamily: {
+        // usa stack do sistema; não baixa nada da web
         sans: [
-          'Inter',
+          'ui-sans-serif',
+          'system-ui',
           '-apple-system',
-          'BlinkMacSystemFont',
           'Segoe UI',
           'Roboto',
-          'Oxygen',
+          'Inter',
+          'Noto Sans',
           'Ubuntu',
           'Cantarell',
-          'sans-serif'
+          'Helvetica Neue',
+          'Arial',
+          'sans-serif',
         ],
       },
       colors: {
+        brand: {
+          royal: '#1a2a6c',
+          gold: '#ffc857',
+          ink: '#0b0f1a',
+        },
+        card: {
+          dark: '#121929',
+        },
+        border: {
+          dark: '#1f2a44',
+        },
         royal: "#1E90FF",
         gold: "#FFD700",
         purple: "#8A2BE2",
