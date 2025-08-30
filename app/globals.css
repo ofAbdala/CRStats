@@ -121,7 +121,8 @@
   padding: 2px;
   background: conic-gradient(
     from var(--angle, 0deg),
-    #7EF8FF, #7ACBFF, #B084FF, #FF9AE6, #FFE07A, #7AFFE0, #7EF8FF
+    #7EF8FF 0deg, #7ACBFF 60deg, #B084FF 120deg, 
+    #FF9AE6 180deg, #FFE07A 240deg, #7AFFE0 300deg, #7EF8FF 360deg
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
@@ -149,9 +150,9 @@
   top: -50%;
   background: radial-gradient(
     circle at 70% 55%,
-    rgba(126,248,255,.3) 0%,
-    rgba(176,132,255,.15) 30%,
-    rgba(255,231,122,.1) 50%,
+    rgba(126,248,255,.15) 0%,
+    rgba(176,132,255,.08) 30%,
+    rgba(255,231,122,.05) 50%,
     transparent 70%
   );
   filter: blur(40px);
@@ -161,8 +162,8 @@
 }
 
 @keyframes legendaryPulse {
-  from { transform: scale(1); opacity: .4; }
-  to   { transform: scale(1.2); opacity: .7; }
+  from { transform: scale(1); opacity: .2; }
+  to   { transform: scale(1.1); opacity: .4; }
 }
 
 /* AI-Score */
