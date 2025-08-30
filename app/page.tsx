@@ -32,7 +32,7 @@ import SessionHistory from '@/components/SessionHistory';
 import GradientOrbs from '@/components/GradientOrbs';
 import { usePolling } from '@/lib/usePolling';
 import { getArenaByTrophies } from '@/lib/arenas';
-import { parseClashTime, formatDateTime } from '@/lib/time';</action>
+import { parseClashTime, formatDateTime } from '@/lib/time';
 
 async function fetchJson(url: string) {
   const r = await fetch(url, { cache: 'no-store' });
