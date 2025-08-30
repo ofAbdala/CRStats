@@ -511,28 +511,34 @@ export default function Page() {
               )}
 
               {activeTab === 'estatisticas' && player && summary && (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="glass-dark float p-8 text-center">
-                    <TrendingUp className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
-                    <div className="text-3xl font-bold text-emerald-400 mb-2">{summary.winRate}%</div>
-                    <div className="text-white/70">Win Rate</div>
-                    <div className="text-sm text-white/50 mt-2">{summary.wins}W / {summary.losses}L</div>
-                  </div>
-                  <div className="glass-dark float p-8 text-center">
-                    <Crown className="w-10 h-10 text-gold mx-auto mb-4" />
-                    <div className="text-3xl font-bold text-gold mb-2">{player.threeCrownWins?.toLocaleString() || '0'}</div>
-                    <div className="text-white/70">3 Coroas</div>
-                  </div>
-                  <div className="glass-dark float p-8 text-center">
-                    <Trophy className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
-                    <div className="text-3xl font-bold text-fuchsia-400 mb-2">{player.bestTrophies?.toLocaleString() || '0'}</div>
-                    <div className="text-white/70">Melhor Temporada</div>
-                  </div>
-                  <div className="glass-dark float p-8 text-center">
-                    <Zap className="w-10 h-10 text-cyan-400 mx-auto mb-4" />
-                    <div className="text-3xl font-bold text-cyan-400 mb-2">{(summary.trophyDelta > 0 ? '+' : '') + summary.trophyDelta}</div>
-                    <div className="text-white/70">Push Atual</div>
-                    <div className="text-sm text-white/50 mt-2">{summary.matchesTotal} partidas</div>
+                <div className="space-y-8">
+                  {/* Gráfico de Avanço dos Troféus */}
+                  <TrophyChart series={summary.series} />
+                  
+                  {/* Grid de Estatísticas */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="glass-dark float p-8 text-center">
+                      <TrendingUp className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
+                      <div className="text-3xl font-bold text-emerald-400 mb-2">{summary.winRate}%</div>
+                      <div className="text-white/70">Win Rate</div>
+                      <div className="text-sm text-white/50 mt-2">{summary.wins}W / {summary.losses}L</div>
+                    </div>
+                    <div className="glass-dark float p-8 text-center">
+                      <Crown className="w-10 h-10 text-gold mx-auto mb-4" />
+                      <div className="text-3xl font-bold text-gold mb-2">{player.threeCrownWins?.toLocaleString() || '0'}</div>
+                      <div className="text-white/70">3 Coroas</div>
+                    </div>
+                    <div className="glass-dark float p-8 text-center">
+                      <Trophy className="w-10 h-10 text-fuchsia-400 mx-auto mb-4" />
+                      <div className="text-3xl font-bold text-fuchsia-400 mb-2">{player.bestTrophies?.toLocaleString() || '0'}</div>
+                      <div className="text-white/70">Melhor Temporada</div>
+                    </div>
+                    <div className="glass-dark float p-8 text-center">
+                      <Zap className="w-10 h-10 text-cyan-400 mx-auto mb-4" />
+                      <div className="text-3xl font-bold text-cyan-400 mb-2">{(summary.trophyDelta > 0 ? '+' : '') + summary.trophyDelta}</div>
+                      <div className="text-white/70">Push Atual</div>
+                      <div className="text-sm text-white/50 mt-2">{summary.matchesTotal} partidas</div>
+                    </div>
                   </div>
                 </div>
               )}
