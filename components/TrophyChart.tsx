@@ -130,13 +130,13 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
       </div>
       
       {/* Period Selector */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex flex-wrap items-center gap-2 mb-6">
         <span className="text-sm text-white/70 mr-2">Período:</span>
         {periods.map((period) => (
           <button
             key={period.value}
             onClick={() => setSelectedPeriod(period.value)}
-            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+            className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
               selectedPeriod === period.value
                 ? 'bg-cyan-500 text-white shadow-lg'
                 : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
@@ -147,18 +147,18 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
         ))}
       </div>
       
-      <div className="h-64 glass rounded-2xl p-4">
+      <div className="h-48 sm:h-64 glass rounded-2xl p-2 sm:p-4">
         <ReLineChart data={getFilteredData()} />
       </div>
       
       {/* Chart Stats */}
-      <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
         <div className="text-center">
-          <div className="text-lg font-bold text-cyan-400">{getFilteredData().length}</div>
+          <div className="text-base sm:text-lg font-bold text-cyan-400">{getFilteredData().length}</div>
           <div className="text-xs text-white/60">Pontos no gráfico</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-bold text-emerald-400">
+          <div className="text-base sm:text-lg font-bold text-emerald-400">
             {getFilteredData().length > 1 
               ? getFilteredData()[getFilteredData().length - 1]?.trophies - getFilteredData()[0]?.trophies 
               : 0}
@@ -166,7 +166,7 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
           <div className="text-xs text-white/60">Variação no período</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-bold text-gold">
+          <div className="text-base sm:text-lg font-bold text-gold">
             {getFilteredData().length > 0 
               ? Math.max(...getFilteredData().map(d => d.trophies))
               : 0}
