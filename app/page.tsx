@@ -25,11 +25,6 @@ async function fetchJson(url: string) {
     }
     throw e;
   }
-      return null;
-    }
-    throw e;
-  }
-}
 }
 
 export default function Page() {
