@@ -185,8 +185,7 @@ export default function Page() {
                     Clash<span className="text-cyan-400">Dex</span>
                   </h1>
                   <p className="text-xl md:text-2xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
-                    Analise suas estatísticas do Clash Royale com interface inspirada no iOS. 
-                    Gráficos elegantes, histórico detalhado e progresso em tempo real.
+                    Analise suas estatísticas do Clash Royale com progresso em tempo real. by X1.Payments
                   </p>
                 </div>
 
