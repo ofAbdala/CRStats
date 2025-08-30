@@ -41,7 +41,7 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
         </div>
         <div className="text-center sm:text-right">
           <div className={`${currentArena.colors.text} font-bold text-base sm:text-xl`}>Arena {currentArena.id}</div>
-          <div className="text-white/70 text-sm sm:text-base">Win Rate {winRate}%</div>
+          <div className="text-white/70 text-sm sm:text-base">Win Rate {recentWinRate}%</div>
         </div>
       </div>
 
@@ -84,12 +84,22 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
             <span className="text-white/60 text-xs sm:text-base">{currentArena.minTrophies.toLocaleString()} troféus</span>
           </div>
           {nextArena ? (
-            <div className="text-center sm:text-right">
+            <div className="text-left sm:text-right space-y-1">
               <div className="text-white/60 text-xs sm:text-sm">
-                Faltam: <span className="font-bold text-cyan-400">{trophiesNeeded.toLocaleString()}</span> troféus
+                Faltam: <span className="font-bold text-cyan-400">{(nextArena.minTrophies - player.trophies).toLocaleString()}</span> troféus
               </div>
-              <div className="text-white/50 text-xs mt-1">
-                ~<span className="font-bold text-orange-400">{estimatedMatchesNeeded}</span> partidas (60% WR)
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-1 sm:gap-2">
+                <div className="text-white/50 text-xs">
+                  ~<span className="font-bold text-orange-400">{estimatedMatches}</span> partidas
+                </div>
+                {estimatedTimeHours > 0 && (
+                  <>
+                    <span className="hidden sm:inline text-white/30">•</span>
+                    <div className="text-white/50 text-xs">
+                      <span className="font-bold text-blue-400">{formatEstimatedTime(estimatedTimeHours)}</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -123,16 +133,20 @@ export default function LeagueInfo({ player, battles = [] }: LeagueInfoProps) {
         {/* Stats adicionais */}
         <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">
           <div className="text-center">
-            <div className="text-sm sm:text-lg font-bold text-emerald-400">+{avgTrophiesPerWin}</div>
-            <div className="text-xs text-white/60">Média/Vitória</div>
+            <div className="text-sm sm:text-lg font-bold text-emerald-400">
+              {avgTrophiesPerMatch > 0 ? '+' : ''}{Math.round(avgTrophiesPerMatch)}
+            </div>
+            <div className="text-xs text-white/60">Média/Partida</div>
           </div>
           <div className="text-center">
-            <div className="text-sm sm:text-lg font-bold text-cyan-400">{winRate}%</div>
+            <div className="text-sm sm:text-lg font-bold text-cyan-400">{recentWinRate}%</div>
             <div className="text-xs text-white/60">Win Rate</div>
           </div>
           <div className="text-center">
-            <div className="text-sm sm:text-lg font-bold text-gold">{recentWins.length}</div>
-            <div className="text-xs text-white/60">Vitórias</div>
+            <div className="text-sm sm:text-lg font-bold text-gold">
+              {battles.filter(b => b.result === 'WIN').length}
+            </div>
+            <div className="text-xs text-white/60">Vitórias Rec.</div>
           </div>
         </div>
       </div>
