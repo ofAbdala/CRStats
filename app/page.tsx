@@ -631,7 +631,7 @@ export default function Page() {
                         </div>
                         <div>
                           <h2 className="text-2xl font-bold text-white">Sessão Atual</h2>
-                          <p className="text-white/70">Estatísticas das últimas 2 horas</p>
+                          <p className="text-white/70">Estatísticas da sessão ativa</p>
                         </div>
                       </div>
                       
@@ -690,19 +690,33 @@ export default function Page() {
                         </div>
                       </div>
                       
-                      <div className="glass p-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-white/70">Última atividade:</span>
-                          <span className="text-emerald-400 font-bold">
-                            {liveData.minutesSinceLastBattle} minuto{liveData.minutesSinceLastBattle !== 1 ? 's' : ''} atrás
-                          </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="glass p-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-white/70">Última atividade:</span>
+                            <span className="text-emerald-400 font-bold">
+                              {liveData.minutesSinceLastBattle} minuto{liveData.minutesSinceLastBattle !== 1 ? 's' : ''} atrás
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="glass p-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-white/70">Push atual:</span>
+                            <span className={`font-bold ${
+                              liveData.currentSession.trophyChange > 0 ? 'text-emerald-400' : 
+                              liveData.currentSession.trophyChange < 0 ? 'text-rose-400' : 'text-gray-400'
+                            }`}>
+                              {liveData.currentSession.trophyChange > 0 ? '+' : ''}{liveData.currentSession.trophyChange} troféus
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   )}
 
                   {/* Monitoramento */}
-                  <div className="glass-dark float p-6 sm:p-8">
+                  {liveData?.isActive && liveData?.currentSession && liveData.currentSession.battles > 0 && (
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
                         <RefreshCw className={`w-7 h-7 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
