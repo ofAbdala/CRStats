@@ -31,6 +31,7 @@ Crie **`.env.local`** na raiz (NÃO commit):
 SUPERCELL_TOKEN=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjllNzc3MDdmLThhMzktNGQzZS1iZjJmLTg4OTkyNjc5NDkwZiIsImlhdCI6MTc1NjMzNTEzMSwic3ViIjoiZGV2ZWxvcGVyLzFmYjRhZjE5LTQ4ZjItMzc1Ni0wN2ZhLWMxNTI5NjIzZjczNSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI0NS43OS4yMTguNzkiLCIxNzcuMzIuMjUyLjMzIiwiMTA0LjIzLjIwOS4xNzYiXSwidHlwZSI6ImNsaWVudCJ9XX0.xa7rBoqp1cWOYXppNp5B-TbTcux07SkO8swS0u8hqkMrGsQewJCeJnjK2CQljbhtcXddJKj1arW5FsNa7iDIgA
 USE_PROXY=false    # local com IP whitelisted; em hospedagem com IP dinâmico use true
 DEFAULT_TAG=U9UUCCQ
+NEXT_FONT_GOOGLE_TIMEOUT=30000    # timeout para Google Fonts (previne AbortError)
 ```
 
 ## Rodar em desenvolvimento
@@ -95,6 +96,7 @@ export async function GET() {
    * `SUPERCELL_TOKEN` = seu token (uma linha, sem aspas)
    * `USE_PROXY` = `true`  ← IP do Bolt é dinâmico
    * `DEFAULT_TAG` = `U9UUCCQ`
+   * `NEXT_FONT_GOOGLE_TIMEOUT` = `30000`  ← previne timeout do Google Fonts
 2. **Build/Start/Port**:
 
    * Build Command: `npm run build`
@@ -113,6 +115,7 @@ export async function GET() {
   * `SUPERCELL_TOKEN`
   * `USE_PROXY=true`
   * `DEFAULT_TAG=U9UUCCQ`
+  * `NEXT_FONT_GOOGLE_TIMEOUT=30000`
 * Deploy → testar `/api/health`.
 
 ---
