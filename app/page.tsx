@@ -32,6 +32,7 @@ import SessionHistory from '@/components/SessionHistory';
 import GradientOrbs from '@/components/GradientOrbs';
 import { usePolling } from '@/lib/usePolling';
 import { getArenaByTrophies } from '@/lib/arenas';
+import { parseClashTime, formatDateTime } from '@/lib/time';</action>
 
 async function fetchJson(url: string) {
   const r = await fetch(url, { cache: 'no-store' });
@@ -51,6 +52,9 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<string>('resumo');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [liveData, setLiveData] = useState<any>(null);
+  const [isPlayerActive, setIsPlayerActive] = useState<boolean>(false);
+  const [lastBattleTime, setLastBattleTime] = useState<string | null>(null);
 
   async function load(t: string) {
     setLoading(true); setErr(null);
@@ -63,10 +67,61 @@ export default function Page() {
       setPlayer(p); setSummary(s); setBattles(b);
       setShowPlayerData(true);
       setLastUpdated(new Date());
+      
+      // Atualiza dados do live
+      updateLiveData(b, p);
     } catch (e: any) {
       setErr(e.message || 'Erro');
       setShowPlayerData(false);
     } finally { setLoading(false); }
+  }
+
+  function updateLiveData(battlesData: any[], playerData: any) {
+    if (!battlesData.length) return;
+    
+    const latestBattle = battlesData[0];
+    const now = new Date();
+    const battleTime = parseClashTime(latestBattle.battleTime);
+    
+    if (!battleTime) return;
+    
+    // Player está ativo se última batalha foi há menos de 10 minutos
+    const minutesSinceLastBattle = (now.getTime() - battleTime.getTime()) / (1000 * 60);
+    const isActive = minutesSinceLastBattle <= 10;
+    
+    setIsPlayerActive(isActive);
+    setLastBattleTime(latestBattle.battleTime);
+    
+    // Calcula estatísticas da sessão atual (batalhas das últimas 2 horas)
+    const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+    const currentSessionBattles = battlesData.filter(battle => {
+      const bTime = parseClashTime(battle.battleTime);
+      return bTime && bTime >= twoHoursAgo;
+    });
+    
+    const sessionWins = currentSessionBattles.filter(b => b.result === 'WIN').length;
+    const sessionLosses = currentSessionBattles.filter(b => b.result === 'LOSS').length;
+    const sessionTrophyChange = currentSessionBattles.reduce((sum, b) => sum + (b.trophyChange || 0), 0);
+    const sessionWinRate = currentSessionBattles.length ? Math.round((sessionWins / currentSessionBattles.length) * 100) : 0;
+    
+    // Calcula frequência de jogo (batalhas por hora)
+    const sessionDurationHours = currentSessionBattles.length > 1 ? 
+      (battleTime.getTime() - parseClashTime(currentSessionBattles[currentSessionBattles.length - 1].battleTime)!.getTime()) / (1000 * 60 * 60) : 0;
+    const battlesPerHour = sessionDurationHours > 0 ? currentSessionBattles.length / sessionDurationHours : 0;
+    
+    setLiveData({
+      isActive,
+      lastBattleTime: latestBattle.battleTime,
+      minutesSinceLastBattle: Math.round(minutesSinceLastBattle),
+      currentSession: {
+        battles: currentSessionBattles.length,
+        wins: sessionWins,
+        losses: sessionLosses,
+        winRate: sessionWinRate,
+        trophyChange: sessionTrophyChange,
+        battlesPerHour: Math.round(battlesPerHour * 10) / 10 // 1 casa decimal
+      }
+    });
   }
 
   function onSearch(e: React.FormEvent<HTMLFormElement>) {
@@ -89,19 +144,25 @@ export default function Page() {
     if (!tag || loading) return;
     setIsRefreshing(true);
     try {
-      await load(tag);
+      const [p, s, b] = await Promise.all([
+        fetchJson(`/api/player/${tag}`),
+        fetchJson(`/api/player/${tag}/summary?last=20`),
+        fetchJson(`/api/player/${tag}/battles?last=20`)
+      ]);
+      setPlayer(p); setSummary(s); setBattles(b);
+      setLastUpdated(new Date());
+      updateLiveData(b, p);
     } finally {
       setIsRefreshing(false);
     }
   }
 
-  // Auto-refresh a cada 2 minutos quando há dados carregados
+  // Auto-refresh a cada 1 minuto quando na aba "Ao Vivo"
   usePolling(async () => {
-    if (showPlayerData && tag && !loading && !isRefreshing) {
-      // Comentado para desabilitar auto-refresh
-      // await refreshData();
+    if (showPlayerData && tag && !loading && !isRefreshing && activeTab === 'live') {
+      await refreshData();
     }
-  }, undefined); // Auto-refresh desabilitado
+  }, activeTab === 'live' ? 60000 : undefined); // 1 minuto apenas na aba live</action>
 
   const features = [
     {
@@ -511,21 +572,192 @@ export default function Page() {
               )}
 
               {activeTab === 'live' && (
-                <div className="glass-dark float p-12">
-                  <div className="text-center">
-                    <Zap className="w-20 h-20 text-cyan-400 mx-auto mb-6 floaty" />
-                    <h3 className="text-3xl font-bold text-white mb-4">Modo Ao Vivo</h3>
-                    <p className="text-xl text-white/70 mb-8 max-w-md mx-auto">
-                      Acompanhe partidas em tempo real e estatísticas ao vivo
-                    </p>
-                    <div className="glass p-6 max-w-md mx-auto">
-                      <div className="flex items-center justify-center gap-3 text-emerald-400">
-                        <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                        <span>Monitoramento ativo</span>
+                <div className="space-y-8">
+                  {/* Status de Atividade */}
+                  <div className="glass-dark float p-6 sm:p-8">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                        liveData?.isActive ? 'bg-emerald-500' : 'bg-gray-600'
+                      }`}>
+                        <Zap className="w-7 h-7 text-white" />
                       </div>
-                      <div className="text-sm text-white/50 mt-3">
-                        Dados atualizados automaticamente a cada 2 minutos
+                      <div>
+                        <h2 className="text-2xl font-bold text-white">Status Ao Vivo</h2>
+                        <p className={`text-sm ${liveData?.isActive ? 'text-emerald-400' : 'text-gray-400'}`}>
+                          {liveData?.isActive ? '🟢 Jogador Ativo' : '🔴 Jogador Offline'}
+                        </p>
                       </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="glass p-4 text-center">
+                        <div className="text-sm text-white/70 mb-2">Última Batalha</div>
+                        <div className="text-lg font-bold text-cyan-400">
+                          {liveData?.minutesSinceLastBattle || 0} min atrás
+                        </div>
+                        <div className="text-xs text-white/50 mt-1">
+                          {lastBattleTime ? formatDateTime(lastBattleTime) : '--'}
+                        </div>
+                      </div>
+                      
+                      <div className="glass p-4 text-center">
+                        <div className="text-sm text-white/70 mb-2">Status</div>
+                        <div className={`text-lg font-bold ${liveData?.isActive ? 'text-emerald-400' : 'text-gray-400'}`}>
+                          {liveData?.isActive ? 'Online' : 'Offline'}
+                        </div>
+                        <div className="text-xs text-white/50 mt-1">
+                          {liveData?.isActive ? 'Jogando agora' : 'Inativo'}
+                        </div>
+                      </div>
+                      
+                      <div className="glass p-4 text-center">
+                        <div className="text-sm text-white/70 mb-2">Próxima Verificação</div>
+                        <div className="text-lg font-bold text-blue-400">
+                          {isRefreshing ? 'Agora' : '1 min'}
+                        </div>
+                        <div className="text-xs text-white/50 mt-1">
+                          Auto-refresh ativo
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sessão Atual */}
+                  {liveData?.currentSession && (
+                    <div className="glass-dark float p-6 sm:p-8">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-12 h-12 bg-gradient-to-br from-fuchsia-500 to-purple rounded-2xl flex items-center justify-center">
+                          <BarChart3 className="w-7 h-7 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold text-white">Sessão Atual</h2>
+                          <p className="text-white/70">Estatísticas das últimas 2 horas</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="glass p-4 text-center">
+                          <div className="text-sm text-white/70 mb-2">Partidas</div>
+                          <div className="text-2xl font-bold text-white">{liveData.currentSession.battles}</div>
+                          <div className="text-xs text-white/50">total</div>
+                        </div>
+                        
+                        <div className="glass p-4 text-center">
+                          <div className="text-sm text-white/70 mb-2">Win Rate</div>
+                          <div className={`text-2xl font-bold ${
+                            liveData.currentSession.winRate >= 60 ? 'text-emerald-400' : 
+                            liveData.currentSession.winRate >= 50 ? 'text-gold' : 'text-rose-400'
+                          }`}>
+                            {liveData.currentSession.winRate}%
+                          </div>
+                          <div className="text-xs text-white/50">
+                            {liveData.currentSession.wins}W {liveData.currentSession.losses}L
+                          </div>
+                        </div>
+                        
+                        <div className="glass p-4 text-center">
+                          <div className="text-sm text-white/70 mb-2">Troféus</div>
+                          <div className={`text-2xl font-bold ${
+                            liveData.currentSession.trophyChange > 0 ? 'text-emerald-400' : 
+                            liveData.currentSession.trophyChange < 0 ? 'text-rose-400' : 'text-gray-400'
+                          }`}>
+                            {liveData.currentSession.trophyChange > 0 ? '+' : ''}{liveData.currentSession.trophyChange}
+                          </div>
+                          <div className="text-xs text-white/50">na sessão</div>
+                        </div>
+                        
+                        <div className="glass p-4 text-center">
+                          <div className="text-sm text-white/70 mb-2">Ritmo</div>
+                          <div className="text-2xl font-bold text-blue-400">
+                            {liveData.currentSession.battlesPerHour}
+                          </div>
+                          <div className="text-xs text-white/50">partidas/hora</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Alertas de Atividade */}
+                  {liveData?.isActive && (
+                    <div className="glass-dark float p-6 sm:p-8 border border-emerald-500/30">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center">
+                          <Trophy className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-emerald-400">🔥 Push Ativo Detectado!</h3>
+                          <p className="text-white/70">O jogador está em uma sessão de jogo ativa</p>
+                        </div>
+                      </div>
+                      
+                      <div className="glass p-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-white/70">Última atividade:</span>
+                          <span className="text-emerald-400 font-bold">
+                            {liveData.minutesSinceLastBattle} minuto{liveData.minutesSinceLastBattle !== 1 ? 's' : ''} atrás
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Monitoramento */}
+                  <div className="glass-dark float p-6 sm:p-8">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                        <RefreshCw className={`w-7 h-7 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold text-white">Monitoramento</h2>
+                        <p className="text-white/70">Verificação automática de novas batalhas</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="glass p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                          <span className="text-white font-medium">Auto-Refresh Ativo</span>
+                        </div>
+                        <div className="text-sm text-white/70 space-y-1">
+                          <p>• Verifica novas batalhas a cada 1 minuto</p>
+                          <p>• Detecta atividade em tempo real</p>
+                          <p>• Atualiza estatísticas automaticamente</p>
+                        </div>
+                      </div>
+                      
+                      <div className="glass p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <Clock className="w-5 h-5 text-blue-400" />
+                          <span className="text-white font-medium">Última Verificação</span>
+                        </div>
+                        <div className="text-sm text-white/70">
+                          {lastUpdated ? lastUpdated.toLocaleString('pt-BR', {
+                            timeZone: 'America/Sao_Paulo',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                          }) : '--'}
+                        </div>
+                        <div className="text-xs text-white/50 mt-2">
+                          {isRefreshing ? 'Verificando agora...' : 'Próxima em ~1 min'}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 pt-6 border-t border-white/10">
+                      <button
+                        onClick={refreshData}
+                        disabled={isRefreshing}
+                        className="w-full glass-dark p-4 rounded-xl hover:bg-white/5 transition-all duration-200 disabled:opacity-50"
+                      >
+                        <div className="flex items-center justify-center gap-3">
+                          <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                          <span className="font-medium">
+                            {isRefreshing ? 'Verificando Novas Batalhas...' : 'Verificar Agora'}
+                          </span>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
