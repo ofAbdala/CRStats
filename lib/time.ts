@@ -1,30 +1,27 @@
 // lib/time.ts
+
 export const BRAZIL_TZ = 'America/Sao_Paulo';
 
-// Converte "20250826T032310.000Z" -> "2025-08-26T03:23:10.000Z"
-export function parseClashTime(input?: string | null): Date | null {
-  if (!input || typeof input !== 'string') return null;
-  if (/^\d{4}-\d{2}-\d{2}T/.test(input)) {
-    const d = new Date(input);
-    return isNaN(d.getTime()) ? null : d;
-  }
-  const m = input.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(\.\d+)?Z$/);
-  if (!m) return null;
-  const [, Y, Mo, D, H, Mi, S, Ms = '.000'] = m;
-  const iso = `${Y}-${Mo}-${D}T${H}:${Mi}:${S}${Ms}Z`;
-  const d = new Date(iso);
-  return isNaN(d.getTime()) ? null : d;
-}
+// Tipos estendidos para cobrir chaves que nem sempre existem no TS alvo
+export type ExtendedDateTimeFormatOptions = Intl.DateTimeFormatOptions & {
+  /** 0–3 dígitos fracionários de segundos (nem todos runtimes suportam) */
+  fractionalSecondDigits?: 0 | 1 | 2 | 3;
+  /** Alguns runtimes suportam periodos do dia (am/pm estendido) */
+  dayPeriod?: 'narrow' | 'short' | 'long';
+  /** Ciclo horário */
+  hourCycle?: 'h11' | 'h12' | 'h23' | 'h24';
+};
 
-export function toZoned(date: Date, tz = BRAZIL_TZ): Date {
-  const inv = new Date(date.toLocaleString('en-US', { timeZone: tz }));
-  const diff = date.getTime() - inv.getTime();
-  return new Date(date.getTime() - diff);
-}
-
-// --- Sanitização estrita das opções do Intl.DateTimeFormat ---
-const ALLOWED_KEYS: (keyof Intl.DateTimeFormatOptions)[] = [
+// Lista de chaves permitidas (sanitização); use `as const` para manter tipagem literal
+const ALLOWED_KEYS = [
   'localeMatcher',
+  'calendar',
+  'numberingSystem',
+  'timeZone',
+  'hour12',
+  'hourCycle',
+  'formatMatcher',
+  'weekDay',     // Obs: em alguns TS é "weekday" (com k minúsculo). Ver tratativa abaixo.
   'weekday',
   'era',
   'year',
@@ -34,73 +31,170 @@ const ALLOWED_KEYS: (keyof Intl.DateTimeFormatOptions)[] = [
   'minute',
   'second',
   'timeZoneName',
-  'formatMatcher',
-  'hour12',
-  'timeZone',
-  'calendar',
-  'numberingSystem',
-  'dateStyle',
-  'timeStyle',
-  'hourCycle',
   'dayPeriod',
   'fractionalSecondDigits',
-];
+] as const;
 
+// Type helper: restringe keys para as do tipo estendido
+type AllowedKey = typeof ALLOWED_KEYS[number] & keyof ExtendedDateTimeFormatOptions;
+
+/**
+ * Normaliza as opções recebidas para evitar chaves inválidas em runtimes
+ * e evita o erro de tipo no build. Remove também valores undefined.
+ */
 function sanitizeDTFOptions(
-  opts?: Intl.DateTimeFormatOptions,
-  tz = BRAZIL_TZ
-): Intl.DateTimeFormatOptions {
-  const out: Intl.DateTimeFormatOptions = {};
-  if (opts && typeof opts === 'object') {
-    for (const k of ALLOWED_KEYS) {
-      const v = (opts as any)[k];
-      if (v !== undefined) (out as any)[k] = v;
+  input: Partial<ExtendedDateTimeFormatOptions>
+): ExtendedDateTimeFormatOptions {
+  const out: ExtendedDateTimeFormatOptions = {};
+
+  // Alias de compatibilidade: alguns códigos podem ter usado "weekDay"
+  const normalizedInput: Record<string, unknown> = { ...input };
+  if (normalizedInput['weekDay'] !== undefined && normalizedInput['weekday'] === undefined) {
+    normalizedInput['weekday'] = normalizedInput['weekDay'];
+  }
+
+  for (const key of ALLOWED_KEYS) {
+    const val = normalizedInput[key as string];
+    if (val !== undefined) {
+      // atribuição com `as any` para acomodar chaves opcionais não presentes no lib dom
+      (out as any)[key] = val;
     }
   }
-  // Garante timeZone sempre correto
-  out.timeZone = tz;
 
-  // Se nenhum dateStyle/timeStyle foi passado, define um default
-  if (out.dateStyle === undefined && out.timeStyle === undefined) {
-    out.dateStyle = 'short';
-    out.timeStyle = 'short';
-  }
   return out;
 }
 
-// --- Formatadores seguros ---
-export function formatDateTime(
-  dateLike?: string | Date | null,
-  opts?: Intl.DateTimeFormatOptions,
-  tz = BRAZIL_TZ
+/** Fallback seguro caso Intl quebre com alguma opção não suportada */
+function safeFormat(
+  date: Date,
+  options: Partial<ExtendedDateTimeFormatOptions>
 ): string {
-  if (!dateLike) return '--';
-  const d = typeof dateLike === 'string' ? parseClashTime(dateLike) : new Date(dateLike);
-  if (!d || isNaN(d.getTime())) return '--';
-  const z = toZoned(d, tz);
-  const formatOptions = sanitizeDTFOptions(opts, tz);
-
   try {
-    return new Intl.DateTimeFormat('pt-BR', formatOptions).format(z);
+    return new Intl.DateTimeFormat('pt-BR', options).format(date);
   } catch {
-    // Fallback ultra seguro
-    try {
-      return z.toLocaleString('pt-BR', { timeZone: tz });
-    } catch {
-      return '--';
-    }
+    const basic: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: options.timeZone ?? 'America/Sao_Paulo',
+      hour12: false,
+    };
+    return new Intl.DateTimeFormat('pt-BR', basic).format(date);
   }
 }
 
-export function formatDateOnly(dateLike?: string | Date | null, tz = BRAZIL_TZ): string {
-  return formatDateTime(dateLike, { dateStyle: 'medium', timeStyle: undefined }, tz);
+/** Normaliza entrada para Date válido; se inválido, retorna null */
+function toValidDate(d: string | number | Date | undefined | null): Date | null {
+  if (d == null) return null;
+  const date = d instanceof Date ? d : new Date(d);
+  return isNaN(date.getTime()) ? null : date;
 }
 
-export function formatTimeOnly(dateLike?: string | Date | null, tz = BRAZIL_TZ): string {
-  return formatDateTime(dateLike, { dateStyle: undefined, timeStyle: 'short' }, tz);
+// Converte "20250826T032310.000Z" -> "2025-08-26T03:23:10.000Z" e cria Date
+export function parseClashTime(input?: string | null): Date | null {
+  if (!input || typeof input !== 'string') return null;
+  
+  // Já é ISO?
+  if (/^\d{4}-\d{2}-\d{2}T/.test(input)) {
+    const d = new Date(input);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  
+  // Formato Clash: YYYYMMDDTHHMMSS(.mmm)?Z
+  const m = input.match(
+    /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(\.\d+)?Z$/
+  );
+  if (!m) return null;
+  
+  const [, Y, Mo, D, H, Mi, S, Ms = '.000'] = m;
+  const iso = `${Y}-${Mo}-${D}T${H}:${Mi}:${S}${Ms}Z`;
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d;
 }
 
-// Função extra para mostrar "há X tempo"
+export function toZoned(date: Date, tz = BRAZIL_TZ): Date {
+  // Cria "equivalente" no fuso
+  const inv = new Date(date.toLocaleString('en-US', { timeZone: tz }));
+  const diff = date.getTime() - inv.getTime();
+  return new Date(date.getTime() - diff);
+}
+
+/** Formata data+hora com TZ padrão BR se não fornecida */
+export function formatDateTime(
+  dateLike: string | number | Date | undefined | null,
+  opts: Partial<ExtendedDateTimeFormatOptions> = {}
+): string {
+  const d = toValidDate(dateLike);
+  if (!d) return '—';
+
+  const options = sanitizeDTFOptions({
+    timeZone: 'America/Sao_Paulo',
+    ...opts,
+  });
+
+  return safeFormat(d, options);
+}
+
+/** Apenas data (dd/mm/aaaa) */
+export function formatDateOnly(
+  dateLike: string | number | Date | undefined | null,
+  opts: Partial<ExtendedDateTimeFormatOptions> = {}
+): string {
+  const d = toValidDate(dateLike);
+  if (!d) return '—';
+
+  const options = sanitizeDTFOptions({
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    ...opts,
+  });
+
+  return safeFormat(d, options);
+}
+
+/** Apenas hora (HH:mm:ss) */
+export function formatTimeOnly(
+  dateLike: string | number | Date | undefined | null,
+  opts: Partial<ExtendedDateTimeFormatOptions> = {}
+): string {
+  const d = toValidDate(dateLike);
+  if (!d) return '—';
+
+  const options = sanitizeDTFOptions({
+    timeZone: 'America/Sao_Paulo',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    ...opts,
+  });
+
+  return safeFormat(d, options);
+}
+
+/** Ex: "há 5m", "há 2h", "há 3d" */
+export function formatRelativeAgo(
+  dateLike: string | number | Date | undefined | null
+): string {
+  const d = toValidDate(dateLike);
+  if (!d) return '—';
+  const diffMs = Date.now() - d.getTime();
+  const s = Math.max(0, Math.floor(diffMs / 1000));
+  if (s < 60) return `há ${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `há ${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `há ${h}h`;
+  const dd = Math.floor(h / 24);
+  return `há ${dd}d`;
+}
+
+// Função extra para mostrar "há X tempo" (alias para compatibilidade)
 export function formatAgo(dateLike?: string | Date | null): string {
   const d = typeof dateLike === 'string' ? parseClashTime(dateLike) : new Date(dateLike!);
   if (!d || isNaN(d.getTime())) return '--';
@@ -159,21 +253,21 @@ export function sortByDate<T extends { battleTime?: string }>(
   dateField: keyof T = 'battleTime' as keyof T,
   ascending = false
 ): T[] {
-  return items
+  // Create intermediate array with explicit separation of original item and parsed date
+  const itemsWithDates = items
     .map(item => ({
-      ...item,
-      _parsedDate: parseClashTime(item[dateField] as string)
+      originalItem: item,
+      parsedDate: parseClashTime(item[dateField] as string)
     }))
-    .filter(item => item._parsedDate)
-    .sort((a, b) => {
-      const dateA = a._parsedDate!.getTime();
-      const dateB = b._parsedDate!.getTime();
-      return ascending ? dateA - dateB : dateB - dateA;
-    })
-    .map(({ _parsedDate, ...item }) => item);
-}
+    .filter(({ parsedDate }) => parsedDate !== null);
 
-/** Alias compatível com o que seu código esperava */
-export function brazilTime(): Date {
-  return toZoned(new Date(), BRAZIL_TZ);
+  // Sort by parsed date
+  const sorted = itemsWithDates.sort((a, b) => {
+    const dateA = a.parsedDate!.getTime();
+    const dateB = b.parsedDate!.getTime();
+    return ascending ? dateA - dateB : dateB - dateA;
+  });
+
+  // Return only the original items
+  return sorted.map(({ originalItem }) => originalItem);
 }
