@@ -1681,10 +1681,17 @@ video {
   background: var(--card-bg);
   box-shadow: 0 6px 20px rgba(0,0,0,0.35);
   transition: transform .18s ease, box-shadow .18s ease;
+  z-index: 1;
 }
 .match-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+}
+
+/* Garante que o conteúdo fique por cima */
+.match-card > * {
+  position: relative;
+  z-index: 2;
 }
 
 /* FUNDO COM DEGRADÊ ANIMADO */
@@ -1692,10 +1699,11 @@ video {
   content: "";
   position: absolute; inset: 0;
   background: linear-gradient(100deg,var(--win-1),var(--win-2) 55%,var(--win-3));
-  opacity: .35;
+  opacity: .12;
   background-size: 200% 200%;
-  animation: gradientShift 4s ease-in-out infinite alternate;
+  animation: gradientShift 2s ease-in-out infinite alternate;
   pointer-events: none;
+  z-index: 0;
 }
 
 @keyframes gradientShift {
@@ -1711,12 +1719,13 @@ video {
   background: radial-gradient(
     circle at 70% 55%,
     rgba(255,215,0,.65) 0%,
-    rgba(255,215,0,.35) 20%,
+    rgba(255,215,0,.08) 20%,
     rgba(255,215,0,0) 60%
   );
   filter: blur(60px);
-  animation: pulse 2s ease-in-out infinite alternate;
+  animation: pulse 1s ease-in-out infinite alternate;
   pointer-events: none;
+  z-index: 0;
 }
 @keyframes pulse {
   from { transform: scale(1); opacity: .5; }
