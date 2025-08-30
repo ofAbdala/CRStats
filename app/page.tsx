@@ -466,7 +466,7 @@ export default function Page() {
                   <LeagueInfo player={player} battles={battles} />
                   <SessionHistory battles={battles} />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <TrophyChart series={summary.series} battles={battles} />
+                    <TrophyChart series={summary.series} battles={battles} player={player} />
                     <div className="glass-dark float p-8">
                       <div className="flex items-center gap-4 mb-8">
                         <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center">
@@ -513,7 +513,7 @@ export default function Page() {
               {activeTab === 'estatisticas' && player && summary && (
                 <div className="space-y-8">
                   {/* Gráfico de Avanço dos Troféus */}
-                  <TrophyChart series={summary.series} battles={battles} />
+                  <TrophyChart series={summary.series} battles={battles} player={player} />
                   
                   {/* Grid de Estatísticas */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">

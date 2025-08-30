@@ -3,15 +3,16 @@
 import { useState } from 'react';
 import { parseClashTime } from '@/lib/time';
 import dynamic from 'next/dynamic';
+import { formatDateTime } from '@/lib/time';
 const ReLineChart = dynamic(() => import('./_TrophyChartImpl'), { ssr: false });
 
 type Period = '60D' | '30D' | '15D' | '6D' | 'Today';
-export default function TrophyChart({ series, battles }: { series: any[]; battles?: any[] }) {
+export default function TrophyChart({ series, battles, player }: { series: any[]; battles?: any[]; player?: any }) {
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('15D');
 
-  // Filtra dados baseado no período selecionado
+  // Reconstrói série de troféus baseado no período selecionado
   const getFilteredData = () => {
-    if (!battles || battles.length === 0) return series;
+    if (!battles || battles.length === 0 || !player) return series;
 
     const now = new Date();
     let cutoffDate: Date;
@@ -36,30 +37,63 @@ export default function TrophyChart({ series, battles }: { series: any[]; battle
         return series;
     }
 
-    // Filtra séries baseado na data de corte
-    const filteredSeries = series.filter(point => {
-      // Tenta extrair a data do label da série
-      const battle = battles.find(b => {
-        const battleDate = parseClashTime(b.battleTime);
-        if (!battleDate) return false;
-        const battleLabel = battleDate.toLocaleString('pt-BR', {
+    // Filtra batalhas pelo período
+    const filteredBattles = battles
+      .filter(battle => {
+        const battleDate = parseClashTime(battle.battleTime);
+        return battleDate && battleDate >= cutoffDate;
+      })
+      .sort((a, b) => {
+        const dateA = parseClashTime(a.battleTime);
+        const dateB = parseClashTime(b.battleTime);
+        if (!dateA || !dateB) return 0;
+        return dateA.getTime() - dateB.getTime(); // Mais antiga primeiro
+      });
+
+    if (filteredBattles.length === 0) return [];
+
+    // Reconstrói série de troféus para o período
+    let currentTrophies = player.trophies;
+    
+    // Calcula troféus no início do período (subtrai mudanças das batalhas)
+    for (const battle of filteredBattles.reverse()) {
+      currentTrophies -= (battle.trophyChange || 0);
+    }
+    
+    // Reordena para mais antiga primeiro
+    filteredBattles.reverse();
+    
+    const newSeries = [];
+    let trophies = currentTrophies;
+    
+    // Adiciona ponto inicial se não for "Today"
+    if (selectedPeriod !== 'Today') {
+      newSeries.push({
+        label: formatDateTime(filteredBattles[0]?.battleTime, { 
           day: '2-digit',
           month: '2-digit',
           hour: '2-digit',
           minute: '2-digit'
-        });
-        return point.label === battleLabel;
+        }),
+        trophies: trophies
       });
-      
-      if (battle) {
-        const battleDate = parseClashTime(battle.battleTime);
-        return battleDate && battleDate >= cutoffDate;
-      }
-      
-      return true; // Mantém pontos que não conseguimos associar
+    }
+    
+    // Adiciona pontos para cada batalha
+    filteredBattles.forEach(battle => {
+      trophies += (battle.trophyChange || 0);
+      newSeries.push({
+        label: formatDateTime(battle.battleTime, { 
+          day: '2-digit',
+          month: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        trophies: trophies
+      });
     });
 
-    return filteredSeries.length > 0 ? filteredSeries : series;
+    return newSeries;
   };
 
   const periods: { value: Period; label: string }[] = [
