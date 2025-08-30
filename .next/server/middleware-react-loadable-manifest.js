@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST='{"components/TrophyChart.tsx -> ./_TrophyChartImpl":{"id":9955,"files":["static/chunks/411.6befe33c4e225560.js","static/chunks/955.5ac11064cd3e98ac.js"]}}';
