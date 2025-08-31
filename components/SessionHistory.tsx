@@ -1,23 +1,23 @@
 'use client';
 
-import Image from 'next/image';
-import { Clock, Trophy, TrendingUp, TrendingDown, Calendar, Target, Crown, Swords } from 'lucide-react';
-import { parseClashTime, formatDateTime, calculateDuration, formatAgo } from '@/lib/time';
-import { getArenaByTrophies } from '@/lib/arenas';
+import { motion } from 'framer-motion';
+import { Clock, Trophy, Calendar, Target, TrendingUp, Zap } from 'lucide-react';
+import { parseClashTime, formatDateTime, formatAgo } from '@/lib/time';
+import { fadeInUp, cardHover } from '@/utils/animations';
 
-// Função para agrupar batalhas por sessões (baseado em gaps de tempo)
+// Group battles by sessions based on time gaps
 function groupBattlesBySessions(battles: any[]) {
   if (!battles.length) return [];
   
   const sessions = [];
   let currentSession = [];
-  const SESSION_GAP_MINUTES = 30; // 30 minutos de gap = nova sessão
+  const SESSION_GAP_MINUTES = 30;
   
   for (let i = 0; i < battles.length; i++) {
     const battle = battles[i];
     const battleTime = parseClashTime(battle.battleTime);
     
-    if (!battleTime) continue; // Pula batalhas com data inválida
+    if (!battleTime) continue;
     
     if (currentSession.length === 0) {
       currentSession.push(battle);
@@ -30,10 +30,9 @@ function groupBattlesBySessions(battles: any[]) {
         continue;
       }
       
-      const timeDiff = (lastBattleTime.getTime() - battleTime.getTime()) / (1000 * 60); // em minutos
+      const timeDiff = (lastBattleTime.getTime() - battleTime.getTime()) / (1000 * 60);
       
       if (timeDiff > SESSION_GAP_MINUTES) {
-        // Nova sessão
         sessions.push([...currentSession]);
         currentSession = [battle];
       } else {
@@ -49,15 +48,12 @@ function groupBattlesBySessions(battles: any[]) {
   return sessions.map((sessionBattles, index) => {
     const wins = sessionBattles.filter(b => b.result === 'WIN').length;
     const losses = sessionBattles.filter(b => b.result === 'LOSS').length;
-    const draws = sessionBattles.filter(b => b.result === 'DRAW').length;
     const winRate = sessionBattles.length > 0 ? Math.round((wins / sessionBattles.length) * 100) : 0;
-    
     const trophyChange = sessionBattles.reduce((sum, b) => sum + (b.trophyChange || 0), 0);
     
     const startTime = parseClashTime(sessionBattles[sessionBattles.length - 1].battleTime);
     const endTime = parseClashTime(sessionBattles[0].battleTime);
     const duration = (startTime && endTime) ? endTime.getTime() - startTime.getTime() : 0;
-    
     const daysAgo = endTime ? Math.floor((Date.now() - endTime.getTime()) / (1000 * 60 * 60 * 24)) : 0;
     
     return {
@@ -65,7 +61,6 @@ function groupBattlesBySessions(battles: any[]) {
       battles: sessionBattles,
       wins,
       losses,
-      draws,
       total: sessionBattles.length,
       winRate,
       trophyChange,
@@ -79,7 +74,7 @@ function groupBattlesBySessions(battles: any[]) {
 
 function formatTimeAgo(daysAgo: number) {
   if (daysAgo === 0) return 'Hoje';
-  if (daysAgo === 1) return '1 dia atrás';
+  if (daysAgo === 1) return 'Ontem';
   return `${daysAgo} dias atrás`;
 }
 
@@ -89,321 +84,131 @@ function formatSessionDuration(ms: number) {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
+  if (hours > 0) return `${hours}h ${minutes}m`;
   return `${minutes}m`;
 }
 
-// Função para calcular AI-Score baseado na performance
-function calculateAIScore(battle: any) {
-  let score = 50; // Base score
-  
-  // Resultado da partida (maior peso)
-  if (battle.result === 'WIN') {
-    score += 25;
-  } else if (battle.result === 'LOSS') {
-    score -= 25;
-  }
-  
-  // Torres destruídas pelo jogador
-  score += battle.crownsFor * 8;
-  
-  // Torres perdidas (penalidade)
-  score -= battle.crownsAgainst * 6;
-  
-  // Troféus ganhos/perdidos
-  if (battle.trophyChange > 0) {
-    score += Math.min(battle.trophyChange / 3, 15); // Max +15 por troféus
-  } else {
-    score += Math.max(battle.trophyChange / 2, -20); // Max -20 por troféus perdidos
-  }
-  
-  // Bonus para 3 coroas
-  if (battle.crownsFor === 3) {
-    score += 10;
-  }
-  
-  // Penalty se perdeu sem destruir nenhuma torre
-  if (battle.crownsFor === 0 && battle.result === 'LOSS') {
-    score -= 10;
-  }
-  
-  // Garante que o score fica entre 0 e 100
-  return Math.max(0, Math.min(100, Math.round(score)));
-}
-
-// Função para definir cor do AI-Score
-function getAIScoreColor(score: number) {
-  if (score >= 80) return 'bg-emerald-600 text-white';
-  if (score >= 65) return 'bg-blue-600 text-white';
-  if (score >= 50) return 'bg-yellow-600 text-black';
-  if (score >= 35) return 'bg-orange-600 text-white';
-  return 'bg-rose-600 text-white';
-}
-
-interface SessionHistoryProps {
-  battles: any[];
-}
-
-export default function SessionHistory({ battles }: SessionHistoryProps) {
+export default function SessionHistory({ battles }: { battles: any[] }) {
   const sessions = groupBattlesBySessions(battles);
   
   if (sessions.length === 0) {
     return (
-      <div className="glass-dark float p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/80 to-purple-600/80 rounded-2xl flex items-center justify-center">
-            <Clock className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-white">Histórico de Sessões</h2>
-            <p className="text-white/70">Nenhuma sessão encontrada</p>
-          </div>
-        </div>
-      </div>
+      <motion.div 
+        {...fadeInUp}
+        className="premium-gradient border border-gray-800 p-12 rounded-3xl text-center card-glow"
+      >
+        <Calendar className="w-16 h-16 text-gray-600 mx-auto mb-6" />
+        <h2 className="text-2xl font-medium text-white mb-4">Aguardando Sessões</h2>
+        <p className="text-gray-400 font-light">Dados de sessão serão exibidos aqui</p>
+      </motion.div>
     );
   }
 
   return (
-    <div className="glass-dark float p-4 sm:p-8">
-      <div className="flex items-center gap-3 mb-4 sm:mb-6">
-        <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-to-br from-indigo-500/80 to-purple-600/80 rounded-xl sm:rounded-2xl flex items-center justify-center">
-          <Clock className="w-6 sm:w-7 h-6 sm:h-7 text-white" />
-        </div>
+    <motion.div 
+      {...fadeInUp}
+      whileHover={cardHover}
+      className="premium-gradient border border-gray-800 p-8 rounded-3xl card-glow gpu-accelerated group"
+    >
+      <div className="flex items-center gap-4 mb-12">
+        <motion.div 
+          className="w-12 h-12 bg-gray-900 rounded-2xl flex items-center justify-center group-hover:bg-gray-800 transition-all duration-300"
+          whileHover={{ scale: 1.1, rotate: 5 }}
+        >
+          <Calendar className="w-7 h-7 text-white" />
+        </motion.div>
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Histórico de Sessões</h2>
-          <p className="text-sm sm:text-base text-white/70">{sessions.length} sessões de jogo</p>
+          <h2 className="text-2xl font-medium text-white group-hover:text-glow transition-all duration-300">
+            Session Analytics
+          </h2>
+          <p className="text-gray-400 font-light">{sessions.length} sessões de elite analisadas</p>
         </div>
       </div>
       
-      <div className="space-y-4 sm:space-y-6">
-        {sessions.map((session) => (
-          <div key={session.id} className="space-y-3">
-            {/* Header da Sessão */}
-            <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4">
-              {/* Mobile: Layout vertical */}
-              <div className="block sm:hidden space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-cyan-400 text-sm">{formatTimeAgo(session.daysAgo)}</span>
-                  <span className="text-blue-400 text-xs">{formatSessionDuration(session.duration)}</span>
+      <div className="space-y-8">
+        {sessions.map((session, index) => (
+          <motion.div
+            key={session.id}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.6 }}
+            className="space-y-4"
+          >
+            {/* Session Header Premium */}
+            <motion.div 
+              className="glass-premium p-6 rounded-2xl glow-effect gpu-accelerated"
+              whileHover={{ scale: 1.01 }}
+            >
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-center gap-6 text-gray-300 font-light">
+                  <div className="font-medium text-white">{formatTimeAgo(session.daysAgo)}</div>
+                  <div className="text-gray-600">•</div>
+                  <div>{session.total} partidas</div>
+                  <div className="text-gray-600">•</div>
+                  <div>{session.wins}V {session.losses}L</div>
                 </div>
-                <div className="flex items-center justify-between text-xs text-white/70">
-                  <span>{session.total} Jogos • {session.wins}V {session.losses}L • {session.winRate}%</span>
-                  <span className={`font-bold px-2 py-1 rounded ${session.trophyChange >= 0 ? 'bg-emerald-600/20 text-emerald-400' : 'bg-rose-600/20 text-rose-400'}`}>
-                    {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
-                  </span>
+                
+                <div className="flex items-center gap-6">
+                  <div className={`font-medium ${session.trophyChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange} troféus
+                  </div>
+                  <div className="text-gray-400 font-light">{formatSessionDuration(session.duration)}</div>
+                  <div className="text-blue-400 font-medium">{session.winRate}%</div>
                 </div>
-                <div className="text-xs text-orange-400 truncate">{getArenaByTrophies(session.battles[0]?.opponentTrophies || 5000).name}</div>
               </div>
-              
-              {/* Desktop: Layout horizontal original */}
-              <div className="hidden sm:flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-white/70">
-                <span className="font-medium text-cyan-400">{formatTimeAgo(session.daysAgo)}</span>
-                <span>•</span>
-                <span>{session.total} Jogos</span>
-                <span>•</span>
-                <span>{session.wins}V {session.losses}L</span>
-                <span>•</span>
-                <span>{session.winRate}%</span>
-                <span>•</span>
-                <span className={`font-bold ${session.trophyChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {session.trophyChange >= 0 ? '+' : ''}{session.trophyChange}
-                </span>
-                <div className="w-full sm:w-auto"></div>
-                <span>•</span>
-                <span className="text-orange-400 truncate">{getArenaByTrophies(session.battles[0]?.opponentTrophies || 5000).name}</span>
-                <span>•</span>
-                <span className="text-blue-400">{formatSessionDuration(session.duration)}</span>
-              </div>
-            </div>
+            </motion.div>
             
-            {/* Batalhas da Sessão */}
-            <div className="space-y-2 sm:space-y-2">
-              {session.battles.map((battle, battleIndex) => (
-                <div 
-                  key={battleIndex} 
-                  className={`${
-                    battle.result === 'WIN' && battle.crownsFor === 3
-                      ? 'match-card win'
-                      : `glass-dark border-l-4 p-3 sm:p-4 hover-lift ${
-                          battle.result === 'WIN' 
-                            ? 'border-l-emerald-500' 
-                            : 'border-l-rose-500'
-                        }`
+            {/* Session Battles Premium */}
+            <div className="space-y-3 pl-4">
+              {session.battles.slice(0, 5).map((battle, battleIndex) => (
+                <motion.div
+                  key={battleIndex}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + battleIndex * 0.05, duration: 0.4 }}
+                  whileHover={{ scale: 1.01, x: 8 }}
+                  className={`premium-gradient border rounded-2xl p-4 transition-all duration-300 gpu-accelerated ${
+                    battle.result === 'WIN' ? 'border-green-400/30' : 'border-red-400/30'
                   }`}
                 >
-                  {/* Spotlight effect para 3-crown wins */}
-                  {battle.result === 'WIN' && battle.crownsFor === 3 && (
-                    <div className="spotlight"></div>
-                  )}
-                  
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center sm:justify-between">
-                    {/* Lado Esquerdo - Modo e Resultado */}
-                    <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                      {/* Modo de Jogo e Tempo */}
-                      <div className="flex flex-col sm:items-center min-w-[60px] sm:min-w-[90px]">
-                        <div className="text-xs sm:text-sm font-medium text-blue-400">Ladder</div>
-                        <div className="text-xs text-gray-500">{formatAgo(battle.battleTime)}</div>
-                      </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <motion.div 
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center font-medium gpu-accelerated ${
+                          battle.result === 'WIN' ? 'bg-green-400 text-black' : 'bg-red-400 text-white'
+                        }`}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                      >
+                        {battle.result === 'WIN' ? '✓' : '✗'}
+                      </motion.div>
                       
-                      {/* Resultado */}
-                      <div className="flex flex-col sm:items-center min-w-[35px] sm:min-w-[50px]">
-                        <div className={`text-xs sm:text-sm font-bold ${
-                          battle.result === 'WIN' ? 'text-emerald-400' : 'text-rose-400'
-                        }`}>
-                          {battle.result === 'WIN' ? 'Win' : 'Loss'}
+                      <div>
+                        <div className="font-medium text-white">{battle.gameMode}</div>
+                        <div className="text-sm text-gray-400 font-light">
+                          vs {battle.opponentName} • {battle.crownsFor}-{battle.crownsAgainst}
                         </div>
-                      </div>
-                      
-                      {/* Torres Destruídas */}
-                      <div className="flex flex-col sm:items-center min-w-[35px] sm:min-w-[50px]">
-                        <div className="text-sm sm:text-lg font-bold text-white">
-                          {battle.crownsFor}/{battle.crownsAgainst}
-                        </div>
-                        <div className="text-xs text-gray-500">Torres</div>
-                      </div>
-                      
-                      {/* Oponente (Mobile: Inline, Desktop: Separado) */}
-                      <div className="flex flex-col sm:hidden min-w-0 flex-1">
-                        <div className="text-xs sm:text-sm font-medium text-white truncate">vs {battle.opponentName}</div>
-                        <div className="text-xs text-gray-500">#{battle.opponentTag}</div>
-                      </div>
-                      
-                      {/* Deck do Jogador (apenas desktop) */}
-                      <div className="hidden lg:flex gap-1 ml-2">
-                        {(battle.teamCards || []).slice(0, 8).map((card: any, cardIndex: number) => (
-                          <div 
-                            key={cardIndex}
-                            className="w-6 h-6 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
-                            title={card.name}
-                          >
-                            {card.iconUrls?.medium ? (
-                              <Image
-                                src={card.iconUrls.medium}
-                                alt={card.name}
-                                width={24}
-                                height={24}
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                                ?
-                              </div>
-                            )}
-                          </div>
-                        ))}
                       </div>
                     </div>
                     
-                    {/* Lado Direito - Oponente e AI-Score */}
-                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 flex-shrink-0">
-                      {/* Nome do Oponente (apenas desktop) */}
-                      <div className="hidden sm:flex flex-col items-center min-w-[80px] sm:min-w-[100px]">
-                        <div className="text-xs sm:text-sm font-medium text-white truncate max-w-[80px] sm:max-w-none">
-                          {battle.opponentName}
-                        </div>
-                        <div className="text-xs text-gray-500">vs</div>
+                    <div className="text-right">
+                      <div className={`text-lg font-medium ${battle.trophyChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {battle.trophyChange >= 0 ? '+' : ''}{battle.trophyChange}
                       </div>
-                      
-                      {/* Deck dos Oponentes (apenas desktop) */}
-                      <div className="hidden lg:flex gap-1">
-                        {(battle.opponentCards || []).slice(0, 8).map((card: any, cardIndex: number) => (
-                          <div 
-                            key={cardIndex}
-                            className="w-5 h-5 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
-                            title={card.name}
-                          >
-                            {card.iconUrls?.medium ? (
-                              <Image
-                                src={card.iconUrls.medium}
-                                alt={card.name}
-                                width={20}
-                                height={20}
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                                ?
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Troféus */}
-                      <div className="flex flex-col items-center sm:ml-2">
-                        <div className="text-xs text-gray-400 mb-1 hidden sm:block">Troféus</div>
-                        <div className={`text-sm sm:text-base lg:text-lg font-bold px-2 sm:px-2 py-1 rounded ${
-                          battle.trophyChange > 0 ? 'bg-emerald-600 text-white' :
-                          battle.trophyChange < 0 ? 'bg-rose-600 text-white' :
-                          'bg-gray-600 text-white'
-                        }`}>
-                          {battle.trophyChange > 0 ? '+' : ''}{battle.trophyChange}
-                        </div>
-                        <div className="text-xs text-gray-400 sm:hidden">troféus</div>
-                      </div>
+                      <div className="text-xs text-gray-500 font-light">{formatAgo(battle.battleTime)}</div>
                     </div>
                   </div>
-                  
-                  {/* Mobile: Decks em linha separada */}
-                  <div className="sm:hidden lg:hidden flex justify-between mt-3 pt-3 border-t border-white/10">
-                    <div className="flex gap-1">
-                      <span className="text-xs text-white/50 mr-1">Meu:</span>
-                      {(battle.teamCards || []).slice(0, 4).map((card: any, cardIndex: number) => (
-                        <div 
-                          key={cardIndex}
-                          className="w-5 h-5 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
-                          title={card.name}
-                        >
-                          {card.iconUrls?.medium ? (
-                            <Image
-                              src={card.iconUrls.medium}
-                              alt={card.name}
-                              width={20}
-                              height={20}
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                              ?
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex gap-1">
-                      <span className="text-xs text-white/50 mr-1">Vs:</span>
-                      {(battle.opponentCards || []).slice(0, 4).map((card: any, cardIndex: number) => (
-                        <div 
-                          key={cardIndex}
-                          className="w-5 h-5 bg-gray-800 rounded border border-gray-700 overflow-hidden relative"
-                          title={card.name}
-                        >
-                          {card.iconUrls?.medium ? (
-                            <Image
-                              src={card.iconUrls.medium}
-                              alt={card.name}
-                              width={20}
-                              height={20}
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                              ?
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                </motion.div>
               ))}
+              
+              {session.battles.length > 5 && (
+                <div className="text-center text-gray-500 text-sm py-2 font-light">
+                  +{session.battles.length - 5} partidas adicionais
+                </div>
+              )}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
