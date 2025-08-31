@@ -2,8 +2,8 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Clash Royale Status',
-  description: 'Dashboard de estatísticas do Clash Royale',
+  title: 'Clash Dex - X1.Payments',
+  description: 'Dashboard profissional de estatísticas do Clash Royale by X1.Payments',
 };
 
 export default function RootLayout({

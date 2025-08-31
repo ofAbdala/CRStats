@@ -212,10 +212,10 @@ export default function Page() {
                   <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-xl flex items-center justify-center">
                     <Crown className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-lg font-bold tracking-wide text-white/95">ClashDex</span>
+                  <span className="text-lg font-bold tracking-wide text-white/95">Clash Dex</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-white/70 hidden sm:block">Clash Royale Stats</span>
+                  <span className="text-sm text-white/70 hidden sm:block">by X1.Payments</span>
                 </div>
               </div>
             </nav>
@@ -230,10 +230,11 @@ export default function Page() {
                     <Crown className="w-10 sm:w-12 h-10 sm:h-12 text-white" />
                   </div>
                   <h1 className="text-gradient text-4xl sm:text-6xl md:text-8xl font-extrabold leading-[1.05] mb-4 sm:mb-6">
-                    Clash<span className="text-cyan-400">Dex</span>
+                    Clash <span className="text-cyan-400">Dex</span>
                   </h1>
                   <p className="text-lg sm:text-xl md:text-2xl text-white/70 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-4">
-                    Analise suas estatísticas do Clash Royale com progresso em tempo real. by X1.Payments
+                    Dashboard profissional de estatísticas do Clash Royale com análise em tempo real.<br/>
+                    <span className="text-cyan-400 font-semibold">Desenvolvido por X1.Payments</span>
                   </p>
                 </div>
 
@@ -300,9 +301,9 @@ export default function Page() {
           <section className="relative py-12 sm:py-20 px-4 sm:px-6">
             <div className="mx-auto max-w-7xl">
               <div className="text-center mb-8 sm:mb-16">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6">Recursos Principais</h2>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6">Recursos do Clash Dex</h2>
                 <p className="text-lg sm:text-xl text-white/70 max-w-3xl mx-auto px-4">
-                  Descubra tudo o que o ClashDex oferece para melhorar sua experiência no Clash Royale
+                  Descubra tudo o que o Clash Dex oferece para melhorar sua experiência no Clash Royale
                 </p>
               </div>
 
@@ -404,7 +405,7 @@ export default function Page() {
                   <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-fuchsia-500 rounded-xl flex items-center justify-center">
                     <Crown className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-lg font-bold tracking-wide text-white/95">ClashDx</span>
+                  <span className="text-lg font-bold tracking-wide text-white/95">Clash Dex</span>
                 </div>
                 <button 
                   onClick={() => setShowPlayerData(false)}
@@ -775,10 +776,10 @@ export default function Page() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-white/60 text-center sm:text-left text-xs sm:text-base">
-              Powered by <span className="text-cyan-400">Supercell API</span> • Inspired by Apple Design
+              <span className="text-cyan-400 font-semibold">X1.ClashDex.com</span> • Powered by <span className="text-fuchsia-400">X1.Payments</span>
             </div>
             <div className="text-white/40 text-xs sm:text-sm">
-              Next.js • Tailwind CSS • Recharts
+              Supercell API • Next.js • Tailwind CSS • Recharts
             </div>
           </div>
         </div>
