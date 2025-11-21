@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST='{"components/battles/BattleDetails.tsx -> @/lib/deckDeepLink":{"id":35975,"files":["static/chunks/975.5f1706f64fe592ef.js"]},"components/pro/DeckAnalytics.tsx -> @/lib/deckDeepLink":{"id":35975,"files":["static/chunks/975.5f1706f64fe592ef.js"]}}';

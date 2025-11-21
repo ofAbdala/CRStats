@@ -119,37 +119,102 @@ export default function BattleHistory({ battles }: BattleHistoryProps) {
       <QuickSummaryCard summary={summary} />
 
       {/* Session View */}
-      {showGrouped && sessions.length > 0 ? (
-        <div className="space-y-4">
-          {sessions.map(session => (
-            <SessionGroup key={session.id} session={session} />
-          ))}
+      {showGrouped ? (
+        <div className="space-y-6">
+          {/* Active/Recent Pushes Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Layers className="w-5 h-5 text-purple-500" />
+              Pushes Ativos
+            </h3>
+
+            {sessions.filter(s => s.isActive).length > 0 ? (
+              <div className="space-y-4">
+                {sessions.filter(s => s.isActive).map(session => (
+                  <SessionGroup key={session.id} session={session} />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 text-center">
+                <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Layers className="w-6 h-6 text-purple-500" />
+                </div>
+                <p className="text-gray-400 mb-1">Nenhum push ativo no momento</p>
+                <p className="text-sm text-gray-500">Jogue 3+ partidas em menos de 30 minutos para iniciar um push</p>
+              </div>
+            )}
+          </div>
+
+          {/* Historical Pushes Section */}
+          {sessions.filter(s => !s.isActive).length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-blue-500" />
+                Histórico de Pushes
+              </h3>
+              <div className="space-y-4">
+                {sessions.filter(s => !s.isActive).map(session => (
+                  <SessionGroup key={session.id} session={session} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* All Sessions Empty State */}
+          {sessions.length === 0 && (
+            <div className="space-y-4">
+              <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-8 text-center">
+                <Layers className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h4 className="text-xl font-semibold text-white mb-2">Nenhuma sessão de push detectada</h4>
+                <p className="text-gray-400 mb-4">Jogue pelo menos 3 partidas em menos de 30 minutos para criar uma sessão</p>
+                <div className="bg-gray-800/50 rounded-lg p-4 max-w-md mx-auto">
+                  <p className="text-sm text-gray-500 mb-2">💡 Dica: Pushes são detectados quando você joga:</p>
+                  <ul className="text-sm text-gray-400 text-left list-disc list-inside space-y-1">
+                    <li>3 ou mais partidas seguidas</li>
+                    <li>Com menos de 30 minutos entre cada uma</li>
+                    <li>Pushes ativos = últimas 2 horas</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Show chronological battles when no sessions */}
+              {filteredBattles.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-gray-500" />
+                    Histórico Cronológico
+                  </h3>
+                  <BattleList battles={filteredBattles} />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Ungrouped Battles */}
           {singles.length > 0 && (
-            <div className="border border-gray-800 rounded-2xl p-4 bg-gray-900/30">
-              <h3 className="text-sm font-medium text-gray-400 mb-3">
-                Batalhas Avulsas ({singles.length})
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Filter className="w-5 h-5 text-gray-500" />
+                Batalhas Avulsas
               </h3>
-              <BattleList battles={singles} />
+              <div className="border border-gray-800 rounded-2xl p-4 bg-gray-900/30">
+                <p className="text-sm text-gray-500 mb-3">
+                  Batalhas que não formaram push (menos de 3 partidas ou gaps maiores que 30min)
+                </p>
+                <BattleList battles={singles} />
+              </div>
             </div>
-          )}
-        </div>
-      ) : showGrouped && sessions.length === 0 ? (
-        /* No sessions detected - fall back to chronological */
-        <div className="space-y-4">
-          <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 text-center">
-            <Layers className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400 mb-2">Nenhuma sessão de push detectada</p>
-            <p className="text-sm text-gray-500">Jogue pelo menos 3 partidas em menos de 30 minutos para criar uma sessão</p>
-          </div>
-          {filteredBattles.length > 0 && (
-            <BattleList battles={filteredBattles} />
           )}
         </div>
       ) : (
         /* Chronological View */
-        <BattleList battles={filteredBattles} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-blue-500" />
+            Visualização Cronológica
+          </h3>
+          <BattleList battles={filteredBattles} />
+        </div>
       )}
     </div>
   );
