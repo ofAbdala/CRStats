@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
@@ -47,6 +48,7 @@ export default function AppSidebar({
     onSectionChange
 }: AppSidebarProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
     const { favorites, removeFavorite } = useFavoritePlayers();
     const { isEnabled: isStreamerMode, toggle: toggleStreamerMode } = useStreamerMode();
 
@@ -129,16 +131,22 @@ export default function AppSidebar({
                 <div className="mt-8 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-2">
                     Comunidade
                 </div>
-                {communityItems.map((item) => (
-                    <Link
-                        key={item.id}
-                        href={item.href}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-900 hover:text-white transition-all duration-200 group"
-                    >
-                        <item.icon className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
-                        <span className="font-medium">{item.label}</span>
-                    </Link>
-                ))}
+                {communityItems.map((item) => {
+                    const isActive = pathname === item.href || activeSection === item.id;
+                    return (
+                        <Link
+                            key={item.id}
+                            href={item.href}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                                ? 'bg-blue-600/10 text-blue-500'
+                                : 'text-gray-400 hover:bg-gray-900 hover:text-white'
+                                }`}
+                        >
+                            <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-blue-500' : 'text-gray-500 group-hover:text-white'}`} />
+                            <span className="font-medium">{item.label}</span>
+                        </Link>
+                    );
+                })}
             </nav>
 
             {/* Favorites Section */}
