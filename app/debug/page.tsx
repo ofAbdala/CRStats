@@ -12,15 +12,15 @@ export default function DebugPage() {
   async function fetchData() {
     setLoading(true);
     setError(null);
-    
+
     try {
       const tag = 'U9UUCCQ';
-      
+
       // Fetch all data
       const [playerRes, summaryRes, battlesRes] = await Promise.all([
         fetch(`/api/player/${tag}`),
-        fetch(`/api/player/${tag}/summary?last=20`),
-        fetch(`/api/player/${tag}/battles?last=20`)
+        fetch(`/api/player/${tag}/summary?last=100`),
+        fetch(`/api/player/${tag}/battles?last=100`)
       ]);
 
       if (!playerRes.ok) {
@@ -57,7 +57,7 @@ export default function DebugPage() {
     <div className="min-h-screen bg-bg-dark p-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-white mb-6">Debug API Data</h1>
-        
+
         <button
           onClick={fetchData}
           disabled={loading}

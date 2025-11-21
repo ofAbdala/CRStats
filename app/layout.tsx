@@ -1,5 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import ProToggle from '@/components/ProToggle';
+import { ToastProvider } from '@/components/Toast';
 
 export const metadata: Metadata = {
   title: 'Clash Dex - Elite Gaming Analytics by X1.Payments',
@@ -18,7 +20,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </head>
       <body className="h-full bg-black text-white antialiased">
-        {children}
+        <ToastProvider>
+          {children}
+          <ProToggle />
+        </ToastProvider>
       </body>
     </html>
   );

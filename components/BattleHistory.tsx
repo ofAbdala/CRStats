@@ -1,150 +1,156 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Clock, Trophy, Swords, Target, TrendingUp } from 'lucide-react';
-import { formatAgo, formatDateTime } from '@/lib/time';
-import { fadeInUp, cardHover } from '@/utils/animations';
+import { useState, useMemo } from 'react';
+import { Battle } from '@/lib/types';
+import QuickSummaryCard from './battles/QuickSummaryCard';
+import SessionGroup from './battles/SessionGroup';
+import BattleList from './battles/BattleList';
+import { Calendar, Layers, Filter } from 'lucide-react';
+import { buildQuickSummary } from '@/lib/stats';
+import { detectSessions } from '@/lib/sessionDetector';
+import { trackEvent } from '@/lib/analytics';
 
-export default function BattleHistory({ battles }: { battles: any[] }) {
+interface BattleHistoryProps {
+  battles: Battle[];
+}
+
+type PeriodFilter = 'today' | '3d' | '7d' | 'season';
+
+export default function BattleHistory({ battles }: BattleHistoryProps) {
+  const [showGrouped, setShowGrouped] = useState(true);
+  const [period, setPeriod] = useState<PeriodFilter>('7d');
+
+  // Filter battles based on selected period
+  const filteredBattles = useMemo(() => {
+    const now = new Date();
+    return battles.filter(b => {
+      const battleDate = new Date(b.battleTime);
+      const diffTime = Math.abs(now.getTime() - battleDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      switch (period) {
+        case 'today':
+          return battleDate.toDateString() === now.toDateString();
+        case '3d':
+          return diffDays <= 3;
+        case '7d':
+          return diffDays <= 7;
+        case 'season':
+          // Simplified season logic: first Monday of current month
+          // For now, just return last 30 days as approximation if season logic is complex
+          return diffDays <= 30;
+        default:
+          return true;
+      }
+    });
+  }, [battles, period]);
+
+  // Detect sessions automatically from filtered battles
+  const { sessions, singles } = useMemo(() => detectSessions(filteredBattles), [filteredBattles]);
+
+  const summary = useMemo(() => buildQuickSummary(filteredBattles), [filteredBattles]);
+
+  const handleViewModeChange = (mode: 'session' | 'chronological') => {
+    setShowGrouped(mode === 'session');
+    trackEvent('history_view_mode_change', { mode });
+  };
+
+  const handlePeriodChange = (newPeriod: PeriodFilter) => {
+    setPeriod(newPeriod);
+    trackEvent('history_period_change', { period: newPeriod });
+  };
+
   return (
-    <motion.div 
-      {...fadeInUp}
-      whileHover={cardHover}
-      className="premium-gradient border border-gray-800 p-8 rounded-3xl card-glow gpu-accelerated group"
-    >
-      <div className="flex items-center gap-4 mb-12">
-        <motion.div 
-          className="w-12 h-12 bg-gray-900 rounded-2xl flex items-center justify-center group-hover:bg-gray-800 transition-all duration-300"
-          whileHover={{ scale: 1.1, rotate: 5 }}
-        >
-          <Swords className="w-7 h-7 text-white" />
-        </motion.div>
-        <div>
-          <h2 className="text-2xl font-medium text-white group-hover:text-glow transition-all duration-300">
-            Battle Analytics
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            Histórico de Batalhas
+            <span className="text-sm font-normal text-gray-500 bg-gray-900 px-2 py-0.5 rounded-full">
+              {filteredBattles.length}
+            </span>
           </h2>
-          <p className="text-gray-400 font-light">Últimas {battles.length} partidas de elite</p>
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        {battles.map((battle, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.4 }}
-            whileHover={{ scale: 1.01, x: 8 }}
-            className={`premium-gradient border rounded-2xl p-6 transition-all duration-300 gpu-accelerated ${
-              battle.result === 'WIN' 
-                ? 'border-green-400/30 glow-effect' 
-                : battle.result === 'LOSS' 
-                ? 'border-red-400/30' 
-                : 'border-gray-700'
-            }`}
-          >
-            {/* Mobile Layout Premium */}
-            <div className="block lg:hidden">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <motion.div 
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center font-medium gpu-accelerated ${
-                      battle.result === 'WIN' ? 'bg-green-400 text-black' : 
-                      battle.result === 'LOSS' ? 'bg-red-400 text-white' : 
-                      'bg-gray-600 text-white'
+
+          <div className="flex flex-wrap gap-2">
+            {/* Period Filter */}
+            <div className="flex items-center gap-1 bg-gray-900/50 p-1 rounded-xl border border-gray-800">
+              {(['today', '3d', '7d', 'season'] as PeriodFilter[]).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => handlePeriodChange(p)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${period === p
+                    ? 'bg-gray-700 text-white'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
                     }`}
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                  >
-                    {battle.result === 'WIN' ? '✓' : battle.result === 'LOSS' ? '✗' : '='}
-                  </motion.div>
-                  <div>
-                    <div className="font-medium text-white">{battle.gameMode}</div>
-                    <div className="text-sm text-gray-400 font-light">{battle.crownsFor} - {battle.crownsAgainst} torres</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`text-lg font-medium ${battle.trophyChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {battle.trophyChange >= 0 ? '+' : ''}{battle.trophyChange}
-                  </div>
-                  <div className="text-xs text-gray-500 font-light">{formatAgo(battle.battleTime)}</div>
-                </div>
-              </div>
-              <div className="text-sm text-gray-400 font-light">vs {battle.opponentName}</div>
+                >
+                  {p === 'today' ? 'Hoje' : p === '3d' ? '3 Dias' : p === '7d' ? '7 Dias' : 'Temporada'}
+                </button>
+              ))}
             </div>
 
-            {/* Desktop Layout Premium */}
-            <div className="hidden lg:flex items-center gap-8">
-              <motion.div 
-                className={`w-16 h-16 rounded-2xl flex items-center justify-center font-medium gpu-accelerated ${
-                  battle.result === 'WIN' ? 'bg-green-400 text-black' : 
-                  battle.result === 'LOSS' ? 'bg-red-400 text-white' : 
-                  'bg-gray-600 text-white'
-                }`}
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ duration: 0.3 }}
+            {/* Toggle View */}
+            <div className="flex items-center gap-1 bg-gray-900/50 p-1 rounded-xl border border-gray-800">
+              <button
+                onClick={() => handleViewModeChange('session')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${showGrouped
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  }`}
               >
-                {battle.result === 'WIN' ? '✓' : battle.result === 'LOSS' ? '✗' : '='}
-              </motion.div>
-              
-              <div className="flex-1">
-                <div className="font-medium text-white text-lg mb-2">{battle.gameMode}</div>
-                <div className="flex items-center gap-6 text-gray-400 font-light">
-                  <span>vs {battle.opponentName}</span>
-                  <span className="flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    {battle.crownsFor} - {battle.crownsAgainst} torres
-                  </span>
-                </div>
-              </div>
-              
-              <div className="text-right space-y-2">
-                <div className={`text-2xl font-light ${battle.trophyChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {battle.trophyChange >= 0 ? '+' : ''}{battle.trophyChange}
-                </div>
-                
-                {battle.opponentTrophies > 0 && (
-                  <div className="flex items-center gap-2 text-gray-400 justify-end">
-                    <Trophy className="w-4 h-4" />
-                    <span className="text-sm font-light">{battle.opponentTrophies}</span>
-                  </div>
-                )}
-                
-                <div className="text-sm text-gray-500 flex items-center gap-2 justify-end font-light">
-                  <Clock className="w-4 h-4" />
-                  <span>{formatAgo(battle.battleTime)}</span>
-                </div>
-              </div>
+                <Layers className="w-3 h-3" />
+                Por Sessão
+              </button>
+              <button
+                onClick={() => handleViewModeChange('chronological')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${!showGrouped
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  }`}
+              >
+                <Calendar className="w-3 h-3" />
+                Cronológico
+              </button>
             </div>
-          </motion.div>
-        ))}
+          </div>
+        </div>
       </div>
 
-      {/* Summary Stats Premium */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.6 }}
-        className="grid grid-cols-3 gap-8 pt-8 mt-8 border-t border-gray-800"
-      >
-        <div className="text-center">
-          <div className="text-xl font-light text-green-400 mb-2 group-hover:text-glow transition-all duration-300">
-            {battles.filter(b => b.result === 'WIN').length}
-          </div>
-          <div className="text-gray-400 text-sm font-light">Vitórias</div>
+      <QuickSummaryCard summary={summary} />
+
+      {/* Session View */}
+      {showGrouped && sessions.length > 0 ? (
+        <div className="space-y-4">
+          {sessions.map(session => (
+            <SessionGroup key={session.id} session={session} />
+          ))}
+
+          {/* Ungrouped Battles */}
+          {singles.length > 0 && (
+            <div className="border border-gray-800 rounded-2xl p-4 bg-gray-900/30">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">
+                Batalhas Avulsas ({singles.length})
+              </h3>
+              <BattleList battles={singles} />
+            </div>
+          )}
         </div>
-        <div className="text-center">
-          <div className="text-xl font-light text-red-400 mb-2 group-hover:text-glow transition-all duration-300">
-            {battles.filter(b => b.result === 'LOSS').length}
+      ) : showGrouped && sessions.length === 0 ? (
+        /* No sessions detected - fall back to chronological */
+        <div className="space-y-4">
+          <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 text-center">
+            <Layers className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-400 mb-2">Nenhuma sessão de push detectada</p>
+            <p className="text-sm text-gray-500">Jogue pelo menos 3 partidas em menos de 30 minutos para criar uma sessão</p>
           </div>
-          <div className="text-gray-400 text-sm font-light">Derrotas</div>
+          {filteredBattles.length > 0 && (
+            <BattleList battles={filteredBattles} />
+          )}
         </div>
-        <div className="text-center">
-          <div className="text-xl font-light text-white mb-2 group-hover:text-glow transition-all duration-300">
-            {recentWinRate}%
-          </div>
-          <div className="text-gray-400 text-sm font-light">Eficiência</div>
-        </div>
-      </motion.div>
-    </motion.div>
+      ) : (
+        /* Chronological View */
+        <BattleList battles={filteredBattles} />
+      )}
+    </div>
   );
 }

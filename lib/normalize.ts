@@ -10,11 +10,19 @@ export function normalizeBattleRow(row: any) {
 
   // Usar parser seguro para datas da Supercell API
   const battleTimeFormatted = formatDateTime(row.battleTime);
-  
+
   return {
     battleTime: row.battleTime,        // UTC string
     battleTimeFormatted,               // Formatted for Brazil
-    gameMode: row.gameMode?.name ?? '',
+    type: row.type || 'PvP',
+    gameMode: {
+      id: row.gameMode?.id || 0,
+      name: row.gameMode?.name || 'Unknown'
+    },
+    // Keep original team/opponent structure for components
+    team: row.team || [team],
+    opponent: row.opponent || [opponent],
+    // Legacy fields for backward compatibility
     result,
     crownsFor: tc,
     crownsAgainst: oc,
@@ -51,7 +59,7 @@ export function computeSummary(player: any, battles: any[]) {
   for (const b of oldestFirst) {
     t += (b.trophyChange || 0);
     series.push({
-      label: formatDateTime(b.battleTime, { 
+      label: formatDateTime(b.battleTime, {
         day: '2-digit',
         month: '2-digit',
         hour: '2-digit',
@@ -61,11 +69,11 @@ export function computeSummary(player: any, battles: any[]) {
     });
   }
 
-  const wins   = windowRows.filter(b => b.result === 'WIN').length;
+  const wins = windowRows.filter(b => b.result === 'WIN').length;
   const losses = windowRows.filter(b => b.result === 'LOSS').length;
   const firstT = oldestFirst[0]?.battleTime;
-  const lastT  = oldestFirst[oldestFirst.length - 1]?.battleTime;
-  
+  const lastT = oldestFirst[oldestFirst.length - 1]?.battleTime;
+
   let pushDurationMs = 0;
   if (firstT && lastT) {
     const firstDate = parseClashTime(firstT);

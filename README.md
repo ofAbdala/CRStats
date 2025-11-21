@@ -130,3 +130,85 @@ export async function GET() {
 
 * **500 nas rotas**
   → variáveis de ambiente ausentes no ambiente de produção (use o painel de envs).
+
+---
+
+## 🎨 Como o Projeto Usa Ícones Oficiais do Clash Royale
+
+Este projeto **NÃO armazena nenhum ícone localmente**.  
+Todos os ícones são servidos diretamente da **CDN oficial da Supercell** através dos campos `iconUrls` retornados pela API.
+
+### 🎯 Origem dos Ícones
+
+Quando chamamos a API da Supercell:
+
+```
+GET https://api.clashroyale.com/v1/players/%23{TAG}
+```
+
+A resposta inclui URLs oficiais para todos os assets visuais:
+
+```json
+{
+  "arena": {
+    "name": "Legendary Arena",
+    "iconUrls": {
+      "small": "https://api-assets.clashroyale.com/arenas/...",
+      "medium": "https://api-assets.clashroyale.com/arenas/..."
+    }
+  },
+  "badges": [
+    {
+      "name": "BattleWins",
+      "iconUrls": {
+        "large": "https://api-assets.clashroyale.com/playerbadges/..."
+      }
+    }
+  ]
+}
+```
+
+### 🧩 Como Usamos no Frontend
+
+Simplesmente consumimos as URLs como `src` nas imagens:
+
+```tsx
+import Image from 'next/image';
+
+<Image 
+  src={player.arenaIconUrl} 
+  alt="Arena" 
+  fill
+  className="object-contain p-2"
+/>
+```
+
+### ⚡ Vantagens
+
+- ✅ **Sempre atualizado**: Se a Supercell atualizar um ícone, o site reflete automaticamente
+- ✅ **Leve e rápido**: CDN global otimizada da Supercell
+- ✅ **Legal e recomendado**: Abordagem oficial permitida pela Supercell
+- ✅ **Zero manutenção**: Sem pacotes de assets, sem build pesado
+
+### 📦 Onde Isso Se Aplica
+
+Este sistema funciona para:
+- ✨ Badges (`player.badges[].iconUrls`)
+- 🏟️ Arenas (`player.arena.iconUrls`)
+- 🛡️ Clãs (`player.clan.badgeUrls`)
+- 🃏 Cartas (endpoint `/v1/cards`)
+- 🎮 Modos de jogo, Ligas, Banners, Eventos
+
+### 🔧 Configuração Next.js
+
+O `next.config.mjs` já está configurado para aceitar imagens da CDN da Supercell:
+
+```js
+images: {
+  remotePatterns: [
+    { protocol: 'https', hostname: 'api-assets.clashroyale.com' }
+  ]
+}
+```
+
+---

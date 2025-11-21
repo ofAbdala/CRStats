@@ -55,19 +55,19 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
     if (filteredBattles.length === 0) return [];
 
     let currentTrophies = player.trophies;
-    
+
     for (const battle of filteredBattles.reverse()) {
       currentTrophies -= (battle.trophyChange || 0);
     }
-    
+
     filteredBattles.reverse();
-    
+
     const newSeries = [];
     let trophies = currentTrophies;
-    
+
     if (selectedPeriod !== 'Today') {
       newSeries.push({
-        label: formatDateTime(filteredBattles[0]?.battleTime, { 
+        label: formatDateTime(filteredBattles[0]?.battleTime, {
           day: '2-digit',
           month: '2-digit',
           hour: '2-digit',
@@ -76,24 +76,24 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
         trophies: trophies
       });
     }
-    
+
     filteredBattles.forEach(battle => {
       trophies += (battle.trophyChange || 0);
-      
+
       let label;
       if (selectedPeriod === 'Today') {
-        label = formatDateTime(battle.battleTime, { 
+        label = formatDateTime(battle.battleTime, {
           dateStyle: undefined,
           timeStyle: 'short'
         });
       } else {
-        label = formatDateTime(battle.battleTime, { 
+        label = formatDateTime(battle.battleTime, {
           day: '2-digit',
           month: '2-digit',
           timeStyle: undefined
         });
       }
-      
+
       newSeries.push({
         label: label,
         trophies: trophies
@@ -116,14 +116,16 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
   const peakTrophies = chartData.length > 0 ? Math.max(...chartData.map(d => d.trophies)) : 0;
 
   return (
-    <motion.div 
-      {...fadeInUp}
+    <motion.div
+      initial={fadeInUp.initial}
+      animate={fadeInUp.animate}
+      transition={fadeInUp.transition}
       whileHover={cardHover}
       className="premium-gradient border border-gray-800 p-8 rounded-3xl card-glow gpu-accelerated group"
     >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
-          <motion.div 
+          <motion.div
             className="w-12 h-12 bg-gray-900 rounded-2xl flex items-center justify-center group-hover:bg-gray-800 transition-all duration-300"
             whileHover={{ scale: 1.1, rotate: 5 }}
           >
@@ -136,7 +138,7 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
             <p className="text-gray-400 font-light">Evolução premium de troféus</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <Filter className="w-5 h-5 text-gray-400" />
           <div className="flex items-center gap-2">
@@ -144,11 +146,10 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
               <motion.button
                 key={period.value}
                 onClick={() => setSelectedPeriod(period.value)}
-                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 gpu-accelerated ${
-                  selectedPeriod === period.value
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 gpu-accelerated ${selectedPeriod === period.value
                     ? 'bg-white text-black button-glow'
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white border border-gray-700'
-                }`}
+                  }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -158,8 +159,8 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
           </div>
         </div>
       </div>
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.6 }}
@@ -167,9 +168,9 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
       >
         <ReLineChart data={chartData} />
       </motion.div>
-      
+
       {/* Chart Statistics Premium */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.6 }}
@@ -182,9 +183,8 @@ export default function TrophyChart({ series, battles, player }: { series: any[]
           <div className="text-gray-400 text-sm font-light">Data Points</div>
         </div>
         <div className="text-center">
-          <div className={`text-xl font-light mb-2 group-hover:text-glow transition-all duration-300 ${
-            hasVariation >= 0 ? 'text-green-400' : 'text-red-400'
-          }`}>
+          <div className={`text-xl font-light mb-2 group-hover:text-glow transition-all duration-300 ${hasVariation >= 0 ? 'text-green-400' : 'text-red-400'
+            }`}>
             {hasVariation >= 0 ? '+' : ''}{hasVariation}
           </div>
           <div className="text-gray-400 text-sm font-light">Variação</div>
