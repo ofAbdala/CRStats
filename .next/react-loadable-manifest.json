@@ -1,14 +1,14 @@
 {
   "components/battles/BattleDetails.tsx -> @/lib/deckDeepLink": {
-    "id": 35975,
+    "id": "components/battles/BattleDetails.tsx -> @/lib/deckDeepLink",
     "files": [
-      "static/chunks/975.5f1706f64fe592ef.js"
+      "static/chunks/_app-pages-browser_lib_deckDeepLink_ts.js"
     ]
   },
   "components/pro/DeckAnalytics.tsx -> @/lib/deckDeepLink": {
-    "id": 35975,
+    "id": "components/pro/DeckAnalytics.tsx -> @/lib/deckDeepLink",
     "files": [
-      "static/chunks/975.5f1706f64fe592ef.js"
+      "static/chunks/_app-pages-browser_lib_deckDeepLink_ts.js"
     ]
   }
 }

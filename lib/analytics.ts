@@ -44,7 +44,9 @@ export type AnalyticsEvent =
     | 'history_period_change'
     | 'session_expand'
     | 'session_collapse'
-    | 'goal_delete';
+    | 'goal_create'
+    | 'goal_delete'
+    | 'leaderboard_load_more';
 
 export interface AnalyticsPayload {
     [key: string]: string | number | boolean | undefined;

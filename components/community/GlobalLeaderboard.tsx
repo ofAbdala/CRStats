@@ -1,6 +1,6 @@
 import { LeaderboardPlayer } from '@/lib/types';
 import { Trophy, Crown } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { trackEvent } from '@/lib/analytics';
 import Link from 'next/link';
 
@@ -12,6 +12,14 @@ export default function GlobalLeaderboard({ players }: GlobalLeaderboardProps) {
     useEffect(() => {
         trackEvent('leaderboard_global_view');
     }, []);
+
+    const [displayCount, setDisplayCount] = useState(10);
+    const displayedPlayers = players.slice(0, displayCount);
+
+    const handleLoadMore = () => {
+        setDisplayCount(prev => prev + 10);
+        trackEvent('leaderboard_load_more');
+    };
 
     return (
         <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
@@ -33,7 +41,7 @@ export default function GlobalLeaderboard({ players }: GlobalLeaderboardProps) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800">
-                        {players.map((player) => (
+                        {displayedPlayers.map((player) => (
                             <tr
                                 key={player.tag}
                                 className="hover:bg-gray-800/50 transition-colors group"
@@ -66,6 +74,17 @@ export default function GlobalLeaderboard({ players }: GlobalLeaderboardProps) {
                     </tbody>
                 </table>
             </div>
+
+            {displayCount < players.length && (
+                <div className="p-4 border-t border-gray-800 flex justify-center">
+                    <button
+                        onClick={handleLoadMore}
+                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
+                    >
+                        Carregar Mais
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

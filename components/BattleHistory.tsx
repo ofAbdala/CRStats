@@ -116,7 +116,7 @@ export default function BattleHistory({ battles }: BattleHistoryProps) {
         </div>
       </div>
 
-      <QuickSummaryCard summary={summary} />
+      <QuickSummaryCard summary={summary} battles={filteredBattles} />
 
       {/* Session View */}
       {showGrouped ? (

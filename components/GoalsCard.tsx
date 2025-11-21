@@ -48,10 +48,36 @@ export default function GoalsCard({ battles, currentTrophies, playerTag }: Goals
         }
     };
 
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newGoalLabel, setNewGoalLabel] = useState('');
+    const [newGoalTarget, setNewGoalTarget] = useState('');
+
+    const handleAddGoal = () => {
+        if (!newGoalLabel || !newGoalTarget) return;
+
+        const target = parseInt(newGoalTarget);
+        if (isNaN(target)) return;
+
+        const newGoal = addGoal(playerTag, {
+            label: newGoalLabel,
+            target: target,
+            current: 0, // Default starting point, could be improved to auto-detect based on type
+            type: 'custom'
+        });
+
+        setGoals(prev => [...prev, newGoal]);
+        trackEvent('goal_create', { label: newGoalLabel });
+
+        // Reset and close
+        setNewGoalLabel('');
+        setNewGoalTarget('');
+        setShowAddModal(false);
+    };
+
     if (!isLoaded) return null;
 
     return (
-        <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+        <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 relative">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -59,7 +85,13 @@ export default function GoalsCard({ battles, currentTrophies, playerTag }: Goals
                     </div>
                     <h3 className="text-lg font-medium text-white">Metas e Objetivos</h3>
                 </div>
-                {/* Future: Add Goal Button */}
+                <button
+                    onClick={() => setShowAddModal(true)}
+                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white"
+                    title="Adicionar Meta"
+                >
+                    <Plus className="w-5 h-5" />
+                </button>
             </div>
 
             <div className="space-y-6">
@@ -118,6 +150,53 @@ export default function GoalsCard({ battles, currentTrophies, playerTag }: Goals
                     </div>
                 </ProFeatureGate>
             </div>
+
+            {/* Add Goal Modal */}
+            {showAddModal && (
+                <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm rounded-2xl flex items-center justify-center z-20 p-6">
+                    <div className="w-full space-y-4">
+                        <h4 className="text-white font-medium mb-4">Nova Meta</h4>
+
+                        <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Nome da Meta</label>
+                            <input
+                                type="text"
+                                value={newGoalLabel}
+                                onChange={(e) => setNewGoalLabel(e.target.value)}
+                                placeholder="Ex: Chegar na Arena 15"
+                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-xs text-gray-500 mb-1 block">Alvo (Número)</label>
+                            <input
+                                type="number"
+                                value={newGoalTarget}
+                                onChange={(e) => setNewGoalTarget(e.target.value)}
+                                placeholder="Ex: 5000"
+                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                            <button
+                                onClick={() => setShowAddModal(false)}
+                                className="flex-1 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleAddGoal}
+                                disabled={!newGoalLabel || !newGoalTarget}
+                                className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors font-medium"
+                            >
+                                Criar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -87,7 +87,7 @@ export default function DecksView({ player }: DecksViewProps) {
                 </div>
             </div>
 
-            {/* Deck Stats Analysis (Mock/Placeholder for now as we need more data for real stats) */}
+            {/* Deck Stats Analysis */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="premium-gradient border border-gray-800 p-6 rounded-3xl">
                     <div className="flex items-center gap-3 mb-4">
@@ -95,13 +95,15 @@ export default function DecksView({ player }: DecksViewProps) {
                         <h3 className="text-lg font-light text-white">Ofensiva</h3>
                     </div>
                     <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        {/* Heuristic: Higher levels = better offense potential (simplified) */}
                         <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: '75%' }}
+                            animate={{ width: `${Math.min(100, (deck.reduce((acc, c) => acc + (14 - (c.maxLevel - c.level)), 0) / (deck.length * 14)) * 100)}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
                             className="h-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
                         />
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">Baseado no nível das cartas</p>
                 </div>
 
                 <div className="premium-gradient border border-gray-800 p-6 rounded-3xl">
@@ -110,13 +112,15 @@ export default function DecksView({ player }: DecksViewProps) {
                         <h3 className="text-lg font-light text-white">Defensiva</h3>
                     </div>
                     <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        {/* Heuristic: Higher elixir cost often implies heavier/control decks */}
                         <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: '60%' }}
+                            animate={{ width: `${Math.min(100, (averageElixir / 5.0) * 100)}%` }}
                             transition={{ duration: 1, delay: 0.7 }}
                             className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
                         />
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">Baseado no custo de elixir (Controle)</p>
                 </div>
 
                 <div className="premium-gradient border border-gray-800 p-6 rounded-3xl">
@@ -125,13 +129,15 @@ export default function DecksView({ player }: DecksViewProps) {
                         <h3 className="text-lg font-light text-white">Versatilidade</h3>
                     </div>
                     <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        {/* Heuristic: Lower elixir cost = faster cycle = more versatile */}
                         <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: '85%' }}
+                            animate={{ width: `${Math.min(100, (1 - (averageElixir / 6.0)) * 100 + 30)}%` }}
                             transition={{ duration: 1, delay: 0.9 }}
                             className="h-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"
                         />
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">Baseado na velocidade de ciclo</p>
                 </div>
             </div>
         </motion.div>
