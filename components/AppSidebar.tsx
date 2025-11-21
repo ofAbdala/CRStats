@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
@@ -49,6 +49,7 @@ export default function AppSidebar({
 }: AppSidebarProps) {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
     const { favorites, removeFavorite } = useFavoritePlayers();
     const { isEnabled: isStreamerMode, toggle: toggleStreamerMode } = useStreamerMode();
 
@@ -81,7 +82,14 @@ export default function AppSidebar({
         if (!active) return;
 
         trackEvent('tab_change', { section: id });
-        onSectionChange?.(id);
+
+        if (onSectionChange) {
+            onSectionChange(id);
+        } else {
+            // If we are not in the dashboard (no onSectionChange), navigate to home
+            router.push('/');
+        }
+
         setIsOpen(false); // Close mobile menu
     };
 

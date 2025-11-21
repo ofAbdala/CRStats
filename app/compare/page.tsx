@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Swords, Trophy, Crown, Zap, Shield, BarChart2 } from 'lucide-react';
+import { Search, Swords, Trophy, Crown, Zap, Shield, BarChart2, Layers } from 'lucide-react';
 import { usePlayerData } from '@/lib/usePlayerData';
 import AppSidebar from '@/components/AppSidebar';
 import Image from 'next/image';
@@ -47,10 +47,11 @@ export default function ComparePage() {
     const player2 = player2Hook.player;
 
     return (
-        <>
-            <AppSidebar />
-            <div className="min-h-screen bg-black text-white p-6 lg:p-8">
-                <div className="max-w-7xl mx-auto space-y-8">
+        <div className="min-h-screen bg-black text-white flex">
+            <AppSidebar activeSection="compare" />
+
+            <div className="flex-1 min-w-0 flex flex-col p-6 lg:p-8 overflow-y-auto h-screen">
+                <div className="max-w-7xl mx-auto space-y-8 w-full">
                     {/* Header */}
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">Comparar Jogadores</h1>
@@ -125,87 +126,177 @@ export default function ComparePage() {
 
                     {/* Comparison Results */}
                     {player1 && player2 && !loading && (
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {/* Player 1 Card */}
+                        <div className="space-y-8">
+                            {/* Summary Banner */}
                             <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 space-y-4"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 border border-blue-500/20 rounded-2xl p-8 text-center relative overflow-hidden"
                             >
-                                <div className="text-center mb-4">
-                                    <h2 className="text-2xl font-bold text-white mb-1">{player1.name}</h2>
-                                    <p className="text-sm text-gray-400">#{player1.tag}</p>
-                                    <p className="text-sm text-gray-400">{player1.clan || 'Sem Clã'}</p>
-                                </div>
+                                <div className="absolute inset-0 bg-grid-white/[0.02] bg-[length:20px_20px]" />
+                                <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+                                    <div className="text-center">
+                                        <h2 className="text-3xl font-bold text-white mb-1">{player1.name}</h2>
+                                        <p className="text-blue-400 font-medium">#{player1.tag}</p>
+                                        <p className="text-sm text-gray-500 mt-1">{player1.clan?.name || 'Sem Clã'}</p>
+                                    </div>
 
-                                <div className="space-y-3">
-                                    <StatRow icon={Trophy} label="Troféus" value={player1.trophies.toLocaleString()} />
-                                    <StatRow icon={Crown} label="Melhor" value={player1.bestTrophies.toLocaleString()} />
-                                    <StatRow icon={Zap} label="Nível" value={player1.expLevel} />
-                                    <StatRow icon={Shield} label="Vitórias" value={player1.wins.toLocaleString()} />
-                                    <StatRow icon={BarChart2} label="3 Coroas" value={player1.threeCrownWins.toLocaleString()} />
+                                    <div className="flex flex-col items-center">
+                                        <div className="text-4xl font-black text-yellow-500 mb-2">VS</div>
+                                        {player1.trophies > player2.trophies ? (
+                                            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold border border-blue-500/30">
+                                                {player1.name} Lidera
+                                            </span>
+                                        ) : player2.trophies > player1.trophies ? (
+                                            <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-bold border border-purple-500/30">
+                                                {player2.name} Lidera
+                                            </span>
+                                        ) : (
+                                            <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-xs font-bold">
+                                                Empate
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="text-center">
+                                        <h2 className="text-3xl font-bold text-white mb-1">{player2.name}</h2>
+                                        <p className="text-purple-400 font-medium">#{player2.tag}</p>
+                                        <p className="text-sm text-gray-500 mt-1">{player2.clan?.name || 'Sem Clã'}</p>
+                                    </div>
                                 </div>
                             </motion.div>
 
-                            {/* Player 2 Card */}
-                            <motion.div
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 space-y-4"
-                            >
-                                <div className="text-center mb-4">
-                                    <h2 className="text-2xl font-bold text-white mb-1">{player2.name}</h2>
-                                    <p className="text-sm text-gray-400">#{player2.tag}</p>
-                                    <p className="text-sm text-gray-400">{player2.clan || 'Sem Clã'}</p>
+                            {/* Stats Comparison Table */}
+                            <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
+                                <div className="grid grid-cols-3 bg-gray-900/80 border-b border-gray-800 p-4 text-sm font-medium text-gray-400 uppercase tracking-wider text-center">
+                                    <div>{player1.name}</div>
+                                    <div>Métrica</div>
+                                    <div>{player2.name}</div>
                                 </div>
+                                <div className="divide-y divide-gray-800">
+                                    <ComparisonRow
+                                        label="Troféus Atuais"
+                                        value1={player1.trophies}
+                                        value2={player2.trophies}
+                                        format={(v: number) => v.toLocaleString()}
+                                        icon={Trophy}
+                                    />
+                                    <ComparisonRow
+                                        label="Recorde de Troféus"
+                                        value1={player1.bestTrophies}
+                                        value2={player2.bestTrophies}
+                                        format={(v: number) => v.toLocaleString()}
+                                        icon={Crown}
+                                    />
+                                    <ComparisonRow
+                                        label="Nível de Experiência"
+                                        value1={player1.expLevel}
+                                        value2={player2.expLevel}
+                                        icon={Zap}
+                                    />
+                                    <ComparisonRow
+                                        label="Total de Vitórias"
+                                        value1={player1.wins}
+                                        value2={player2.wins}
+                                        format={(v: number) => v.toLocaleString()}
+                                        icon={Swords}
+                                    />
+                                    <ComparisonRow
+                                        label="Taxa de Vitória (Estimada)"
+                                        value1={((player1.wins / (player1.wins + player1.losses || 1)) * 100)}
+                                        value2={((player2.wins / (player2.wins + player2.losses || 1)) * 100)}
+                                        format={(v: number) => `${v.toFixed(1)}%`}
+                                        icon={BarChart2}
+                                    />
+                                    <ComparisonRow
+                                        label="Três Coroas"
+                                        value1={player1.threeCrownWins}
+                                        value2={player2.threeCrownWins}
+                                        format={(v: number) => v.toLocaleString()}
+                                        icon={Crown}
+                                    />
+                                    <ComparisonRow
+                                        label="Total de Doações"
+                                        value1={player1.totalDonations}
+                                        value2={player2.totalDonations}
+                                        format={(v: number) => v.toLocaleString()}
+                                        icon={Shield}
+                                    />
+                                </div>
+                            </div>
 
-                                <div className="space-y-3">
-                                    <StatRow icon={Trophy} label="Troféus" value={player2.trophies.toLocaleString()} />
-                                    <StatRow icon={Crown} label="Melhor" value={player2.bestTrophies.toLocaleString()} />
-                                    <StatRow icon={Zap} label="Nível" value={player2.expLevel} />
-                                    <StatRow icon={Shield} label="Vitórias" value={player2.wins.toLocaleString()} />
-                                    <StatRow icon={BarChart2} label="3 Coroas" value={player2.threeCrownWins.toLocaleString()} />
-                                </div>
-                            </motion.div>
+                            {/* Decks Comparison */}
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <DeckPreview player={player1} color="blue" />
+                                <DeckPreview player={player2} color="purple" />
+                            </div>
                         </div>
-                    )}
-
-                    {/* Comparison Summary */}
-                    {player1 && player2 && !loading && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-500/20 rounded-2xl p-6 text-center"
-                        >
-                            {player1.trophies > player2.trophies ? (
-                                <p className="text-lg">
-                                    🏆 {player1.name} está {(player1.trophies - player2.trophies).toLocaleString()} troféus à frente!
-                                </p>
-                            ) : player2.trophies > player1.trophies ? (
-                                <p className="text-lg">
-                                    🏆 {player2.name} está {(player2.trophies - player1.trophies).toLocaleString()} troféus à frente!
-                                </p>
-                            ) : (
-                                <p className="text-lg">
-                                    ⚖️ Empate! Ambos têm {player1.trophies.toLocaleString()} troféus
-                                </p>
-                            )}
-                        </motion.div>
                     )}
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
-function StatRow({ icon: Icon, label, value }: { icon: any; label: string; value: string | number }) {
+function ComparisonRow({ label, value1, value2, format = (v: any) => v, icon: Icon }: any) {
+    const isV1Better = value1 > value2;
+    const isV2Better = value2 > value1;
+    const isEqual = value1 === value2;
+
     return (
-        <div className="flex items-center justify-between bg-gray-800/30 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-                <Icon className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-400">{label}</span>
+        <div className="grid grid-cols-3 p-4 hover:bg-gray-800/30 transition-colors items-center">
+            <div className={`text-center font-medium ${isV1Better ? 'text-green-400' : isEqual ? 'text-white' : 'text-gray-500'}`}>
+                {format(value1)}
+                {isV1Better && <span className="ml-2 text-xs bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded">+{format(value1 - value2)}</span>}
             </div>
-            <span className="text-white font-semibold">{value}</span>
+            <div className="flex flex-col items-center justify-center gap-1">
+                <div className="p-2 bg-gray-800 rounded-full text-gray-400">
+                    <Icon className="w-4 h-4" />
+                </div>
+                <span className="text-xs text-gray-500 font-medium text-center">{label}</span>
+            </div>
+            <div className={`text-center font-medium ${isV2Better ? 'text-green-400' : isEqual ? 'text-white' : 'text-gray-500'}`}>
+                {format(value2)}
+                {isV2Better && <span className="ml-2 text-xs bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded">+{format(value2 - value1)}</span>}
+            </div>
+        </div>
+    );
+}
+
+function DeckPreview({ player, color }: { player: any, color: 'blue' | 'purple' }) {
+    const borderColor = color === 'blue' ? 'border-blue-500/30' : 'border-purple-500/30';
+    const titleColor = color === 'blue' ? 'text-blue-400' : 'text-purple-400';
+
+    return (
+        <div className={`bg-gray-900/50 border ${borderColor} rounded-2xl p-6`}>
+            <h3 className={`text-lg font-bold ${titleColor} mb-4 flex items-center gap-2`}>
+                <Layers className="w-5 h-5" />
+                Deck Atual de {player.name}
+            </h3>
+            {player.currentDeck && player.currentDeck.length > 0 ? (
+                <div className="grid grid-cols-4 gap-2">
+                    {player.currentDeck.map((card: any) => (
+                        <div key={card.id} className="aspect-[3/4] relative bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                            <Image
+                                src={card.iconUrls?.medium || ''}
+                                alt={card.name}
+                                fill
+                                className="object-contain p-1"
+                            />
+                            <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] text-center text-white py-0.5">
+                                Lvl {14 - (card.maxLevel - card.level)}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-8 text-gray-500">
+                    Deck não disponível
+                </div>
+            )}
+            <div className="mt-4 flex justify-between text-sm text-gray-400">
+                <span>Custo Médio: {(player.currentDeck?.reduce((acc: number, c: any) => acc + (c.elixirCost || 0), 0) / 8).toFixed(1)}</span>
+            </div>
         </div>
     );
 }
