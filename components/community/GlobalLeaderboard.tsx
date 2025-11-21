@@ -1,5 +1,5 @@
 import { LeaderboardPlayer } from '@/lib/types';
-import { Trophy, Crown } from 'lucide-react';
+import { Trophy, Crown, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { trackEvent } from '@/lib/analytics';
 import Link from 'next/link';
@@ -14,7 +14,14 @@ export default function GlobalLeaderboard({ players }: GlobalLeaderboardProps) {
     }, []);
 
     const [displayCount, setDisplayCount] = useState(10);
-    const displayedPlayers = players.slice(0, displayCount);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredPlayers = players.filter(p =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.tag.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const displayedPlayers = filteredPlayers.slice(0, displayCount);
 
     const handleLoadMore = () => {
         setDisplayCount(prev => prev + 10);
@@ -23,11 +30,22 @@ export default function GlobalLeaderboard({ players }: GlobalLeaderboardProps) {
 
     return (
         <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
-            <div className="p-6 border-b border-gray-800">
+            <div className="p-6 border-b border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h3 className="text-lg font-medium text-white flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-yellow-500" />
                     Top Jogadores Globais
                 </h3>
+
+                <div className="relative">
+                    <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                        type="text"
+                        placeholder="Buscar jogador..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="bg-gray-900 border border-gray-700 text-white text-sm rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-blue-500 w-full sm:w-64"
+                    />
+                </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -75,7 +93,7 @@ export default function GlobalLeaderboard({ players }: GlobalLeaderboardProps) {
                 </table>
             </div>
 
-            {displayCount < players.length && (
+            {displayCount < filteredPlayers.length && (
                 <div className="p-4 border-t border-gray-800 flex justify-center">
                     <button
                         onClick={handleLoadMore}

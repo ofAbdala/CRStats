@@ -5,7 +5,8 @@ import { Battle } from '@/lib/types';
 import QuickSummaryCard from './battles/QuickSummaryCard';
 import SessionGroup from './battles/SessionGroup';
 import BattleList from './battles/BattleList';
-import { Calendar, Layers, Filter } from 'lucide-react';
+import { Filter, Calendar, Layers, Download } from 'lucide-react';
+import { exportBattlesToCSV } from '@/lib/exportUtils';
 import { buildQuickSummary } from '@/lib/stats';
 import { detectSessions } from '@/lib/sessionDetector';
 import { trackEvent } from '@/lib/analytics';
@@ -59,6 +60,10 @@ export default function BattleHistory({ battles }: BattleHistoryProps) {
     setPeriod(newPeriod);
     trackEvent('history_period_change', { period: newPeriod });
   };
+  const handleExport = () => {
+    exportBattlesToCSV(filteredBattles, `cr-battles-${new Date().toISOString().split('T')[0]}.csv`);
+    trackEvent('history_export_csv');
+  };
 
   return (
     <div className="space-y-6">
@@ -88,6 +93,16 @@ export default function BattleHistory({ battles }: BattleHistoryProps) {
                 </button>
               ))}
             </div>
+
+            {/* Export Button */}
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-3 py-1.5 bg-gray-900/50 hover:bg-gray-800 border border-gray-800 rounded-xl text-gray-400 hover:text-white transition-colors text-xs font-medium"
+              title="Exportar CSV"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">CSV</span>
+            </button>
 
             {/* Toggle View */}
             <div className="flex items-center gap-1 bg-gray-900/50 p-1 rounded-xl border border-gray-800">

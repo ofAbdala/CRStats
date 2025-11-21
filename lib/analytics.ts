@@ -46,7 +46,8 @@ export type AnalyticsEvent =
     | 'session_collapse'
     | 'goal_create'
     | 'goal_delete'
-    | 'leaderboard_load_more';
+    | 'leaderboard_load_more'
+    | 'history_export_csv';
 
 export interface AnalyticsPayload {
     [key: string]: string | number | boolean | undefined;

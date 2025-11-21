@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Users, Heart, Swords, Trophy, Star } from 'lucide-react';
+import { getClanBadgeUrl } from '@/lib/clanBadges';
 
 interface ClanViewProps {
     player: any;
@@ -35,9 +36,16 @@ export default function ClanView({ player }: ClanViewProps) {
 
                 <div className="relative z-10">
                     <div className="flex items-center gap-6 mb-6">
-                        <div className="w-20 h-20 bg-gray-900 rounded-2xl flex items-center justify-center border border-gray-700">
-                            {/* Placeholder for Clan Badge - ideally we'd construct the URL if we had the logic */}
-                            <Users className="w-10 h-10 text-white" />
+                        <div className="w-20 h-20 bg-gray-900 rounded-2xl flex items-center justify-center border border-gray-700 overflow-hidden relative">
+                            {player.clan.badgeId ? (
+                                <img
+                                    src={getClanBadgeUrl(player.clan.badgeId)}
+                                    alt="Clan Badge"
+                                    className="w-full h-full object-contain p-2"
+                                />
+                            ) : (
+                                <Users className="w-10 h-10 text-white" />
+                            )}
                         </div>
                         <div>
                             <h2 className="text-4xl font-light text-white text-glow mb-2">{player.clan}</h2>
